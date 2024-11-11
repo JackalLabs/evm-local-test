@@ -28,8 +28,8 @@ const (
 	ETHER     = 1_000_000_000 * GWEI
 )
 
-var natPorts = nat.PortMap{
-	nat.Port(rpcPort): {},
+var natPorts = nat.PortSet{
+	nat.Port(rpcPort): struct{}{},
 }
 
 type EthereumChain struct {

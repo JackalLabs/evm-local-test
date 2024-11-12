@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/mount"
@@ -227,4 +228,15 @@ func (c *EthereumChain) Height(ctx context.Context) (uint64, error) {
 	// }
 	// return strconv.ParseInt(strings.TrimSpace(string(stdout)), 10, 64)
 	return 0, nil
+}
+
+// Get address of account, cast to a string to use
+func (c *EthereumChain) GetAddress(ctx context.Context, keyName string) ([]byte, error) {
+
+	cmd := []string{"cast", "wallet", "address", "--keystore", c.keystoreMap[keyName], "--password", ""}
+	stdout, _, err := c.Exec(ctx, cmd, nil)
+	if err != nil {
+		return nil, err
+	}
+	return []byte(strings.TrimSpace(string(stdout))), nil
 }

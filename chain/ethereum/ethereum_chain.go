@@ -146,12 +146,17 @@ func (c *EthereumChain) Bind() []string {
 }
 
 func (c *EthereumChain) pullImages(ctx context.Context, cli *dockerclient.Client) {
+
 	for _, image := range c.Config().Images {
 		rc, err := cli.ImagePull(
 			ctx,
 			image.Repository+":"+image.Version,
 			dockertypes.ImagePullOptions{},
 		)
+		fmt.Println("Pulled images\n")
+		fmt.Println(image.Repository)
+		fmt.Println(image.Version)
+
 		if err != nil {
 			c.log.Error("Failed to pull image",
 				zap.Error(err),
@@ -163,6 +168,7 @@ func (c *EthereumChain) pullImages(ctx context.Context, cli *dockerclient.Client
 			_ = rc.Close()
 		}
 	}
+
 }
 
 func (c *EthereumChain) Start(testName string, ctx context.Context, additionalGenesisWallets ...ibc.WalletAmount) error {

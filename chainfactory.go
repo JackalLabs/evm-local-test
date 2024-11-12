@@ -8,8 +8,10 @@ import (
 	"sync"
 
 	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos"
+	"github.com/strangelove-ventures/interchaintest/v7/chain/ethereum"
 	"github.com/strangelove-ventures/interchaintest/v7/chain/penumbra"
 	"github.com/strangelove-ventures/interchaintest/v7/chain/polkadot"
+	logger "github.com/strangelove-ventures/interchaintest/v7/examples/logger"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
@@ -91,6 +93,9 @@ func (f *BuiltinChainFactory) Count() int {
 }
 
 func (f *BuiltinChainFactory) Chains(testName string) ([]ibc.Chain, error) {
+	logger.InitLogger()
+
+	logger.LogInfo(testName)
 	chains := make([]ibc.Chain, len(f.specs))
 	for i, s := range f.specs {
 		cfg, err := s.Config(f.log)
@@ -131,6 +136,8 @@ func buildChain(log *zap.Logger, testName string, cfg ibc.ChainConfig, numValida
 	switch cfg.Type {
 	case "cosmos":
 		return cosmos.NewCosmosChain(testName, cfg, nv, nf, log), nil
+	case "ethereum":
+		return ethereum.NewEthereumChain(testName, cfg, log), nil
 	case "penumbra":
 		return penumbra.NewPenumbraChain(log, testName, cfg, nv, nf), nil
 	case "polkadot":

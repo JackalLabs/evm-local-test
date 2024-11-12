@@ -189,6 +189,8 @@ func (c *EthereumChain) Start(testName string, ctx context.Context, additionalGe
 		}
 		cmd = append(cmd, "--load-state", dockerJsonFile)
 	}
+	// Might need mounts later, but 'deactivate' for now
+	c.log.Info(fmt.Sprintf("%v", mounts))
 
 	err := c.containerLifecycle.CreateContainer(ctx, c.testName, c.NetworkID, c.cfg.Images[0], natPorts, c.Bind(), c.HostName(), cmd)
 	if err != nil {
@@ -215,4 +217,14 @@ func (c *EthereumChain) Start(testName string, ctx context.Context, additionalGe
 
 func (c *EthereumChain) HostName() string {
 	return dockerutil.CondenseHostName(c.Name())
+}
+
+func (c *EthereumChain) Height(ctx context.Context) (uint64, error) {
+	// cmd := []string{"cast", "block-number", "--rpc-url", c.GetRPCAddress()}
+	// stdout, _, err := c.Exec(ctx, cmd, nil)
+	// if err != nil {
+	// 	return 0, err
+	// }
+	// return strconv.ParseInt(strings.TrimSpace(string(stdout)), 10, 64)
+	return 0, nil
 }

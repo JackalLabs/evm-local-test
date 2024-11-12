@@ -68,9 +68,10 @@ func DefaultEthereumAnvilChainConfig(
 		NoHostMount:    false,
 		Images: []ibc.DockerImage{
 			{
-				Repository: "foundry",
+
+				Repository: "ghcr.io/foundry-rs/foundry",
 				Version:    "latest",
-				// UidGid:     "1000:1000",
+				UidGid:     "1000:1000",
 			},
 		},
 		Bin: "anvil",
@@ -239,4 +240,31 @@ func (c *EthereumChain) GetAddress(ctx context.Context, keyName string) ([]byte,
 		return nil, err
 	}
 	return []byte(strings.TrimSpace(string(stdout))), nil
+}
+
+func (c *EthereumChain) BuildWallet(ctx context.Context, keyName string, mnemonic string) (ibc.Wallet, error) {
+	if mnemonic != "" {
+		err := c.RecoverKey(ctx, keyName, mnemonic)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// Use the genesis account
+		if keyName == "faucet" {
+			// TODO: implement RecoverKey() so faucet can be saved to keystore
+			return c.genesisWallets.GetFaucetWallet(keyName), nil
+		} else {
+			// Create new account
+			err := c.CreateKey(ctx, keyName)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	address, err := c.GetAddress(ctx, keyName)
+	if err != nil {
+		return nil, err
+	}
+	return NewWallet(keyName, string(address)), nil
 }

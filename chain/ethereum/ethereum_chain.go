@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	dockertypes "github.com/docker/docker/api/types"
@@ -242,13 +243,19 @@ func (c *EthereumChain) HostName() string {
 }
 
 func (c *EthereumChain) Height(ctx context.Context) (uint64, error) {
-	// cmd := []string{"cast", "block-number", "--rpc-url", c.GetRPCAddress()}
-	// stdout, _, err := c.Exec(ctx, cmd, nil)
-	// if err != nil {
-	// 	return 0, err
-	// }
-	// return strconv.ParseInt(strings.TrimSpace(string(stdout)), 10, 64)
-	return 0, nil
+	cmd := []string{"cast", "block-number", "--rpc-url", c.GetRPCAddress()}
+	stdout, _, err := c.Exec(ctx, cmd, nil)
+	if err != nil {
+		return 0, err
+	}
+	// Parse the result as an int64 first
+	height, err := strconv.ParseInt(strings.TrimSpace(string(stdout)), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	// Cast to uint64 before returning
+	return uint64(height), nil
 }
 
 // Get address of account, cast to a string to use

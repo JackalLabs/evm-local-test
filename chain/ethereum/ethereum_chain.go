@@ -85,7 +85,7 @@ func DefaultEthereumAnvilChainConfig(
 
 				Repository: "ghcr.io/foundry-rs/foundry",
 				Version:    "latest",
-				UidGid:     "1000:1000",
+				// UidGid:     "1000:1000",
 			},
 		},
 		Bin: "anvil",
@@ -214,7 +214,7 @@ func (c *EthereumChain) Start(testName string, ctx context.Context, additionalGe
 	// Might need mounts later, but 'deactivate' for now
 	c.log.Info(fmt.Sprintf("%v", mounts))
 
-	err := c.containerLifecycle.CreateContainer(ctx, c.testName, c.NetworkID, c.cfg.Images[0], natPorts, c.Bind(), c.HostName(), cmd)
+	err := c.containerLifecycle.CreateContainerWithMounts(ctx, c.testName, c.NetworkID, c.cfg.Images[0], natPorts, c.Bind(), mounts, c.HostName(), cmd)
 	if err != nil {
 		return err
 	}

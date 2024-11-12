@@ -8,6 +8,7 @@ import (
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	dockerclient "github.com/docker/docker/client"
 	"github.com/docker/docker/errdefs"
@@ -31,6 +32,71 @@ func NewContainerLifecycle(log *zap.Logger, client *dockerclient.Client, contain
 		client:        client,
 		containerName: containerName,
 	}
+}
+
+func (c *ContainerLifecycle) CreateContainerWithMounts(
+	ctx context.Context,
+	testName string,
+	networkID string,
+	image ibc.DockerImage,
+	ports nat.PortSet,
+	volumeBinds []string,
+	mounts []mount.Mount,
+	hostName string,
+	cmd []string,
+) error {
+	imageRef := image.Ref()
+	c.log.Info(
+		"Will run command",
+		zap.String("image", imageRef),
+		zap.String("container", c.containerName),
+		zap.String("command", strings.Join(cmd, " ")),
+	)
+
+	pb, listeners, err := GeneratePortBindings(ports)
+	if err != nil {
+		return fmt.Errorf("failed to generate port bindings: %w", err)
+	}
+
+	c.preStartListeners = listeners
+
+	cc, err := c.client.ContainerCreate(
+		ctx,
+		&container.Config{
+			Image: imageRef,
+
+			Entrypoint: []string{},
+			Cmd:        cmd,
+
+			Hostname: hostName,
+
+			Labels: map[string]string{CleanupLabel: testName},
+
+			ExposedPorts: ports,
+		},
+		&container.HostConfig{
+			Binds:           volumeBinds,
+			PortBindings:    pb,
+			PublishAllPorts: true,
+			AutoRemove:      false,
+			DNS:             []string{},
+			Mounts:          mounts,
+		},
+		&network.NetworkingConfig{
+			EndpointsConfig: map[string]*network.EndpointSettings{
+				networkID: {},
+			},
+		},
+		nil,
+		c.containerName,
+	)
+	if err != nil {
+		listeners.CloseAll()
+		c.preStartListeners = []net.Listener{}
+		return err
+	}
+	c.id = cc.ID
+	return nil
 }
 
 func (c *ContainerLifecycle) CreateContainer(

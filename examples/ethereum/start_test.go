@@ -9,12 +9,14 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v7"
 	"github.com/strangelove-ventures/interchaintest/v7/chain/ethereum"
 
+	logger "github.com/strangelove-ventures/interchaintest/v7/examples/logger"
 	"github.com/strangelove-ventures/interchaintest/v7/testreporter"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 )
 
 func TestEthereum(t *testing.T) {
+	logger.InitLogger()
 
 	if testing.Short() {
 		t.Skip()

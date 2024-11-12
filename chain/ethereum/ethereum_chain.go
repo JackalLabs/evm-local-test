@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	dockertypes "github.com/docker/docker/api/types"
@@ -66,9 +67,24 @@ func DefaultEthereumAnvilChainConfig(
 		GasAdjustment:  0,
 		TrustingPeriod: "0",
 		NoHostMount:    false,
+
+		/*
+			note: pulling from here failing silently on our m2 studio:
+
+				Manual pulling give this message:
+
+
+					docker pull ghcr.io/foundry-rs/foundry:latest
+
+				latest: Pulling from foundry-rs/foundry
+				no matching manifest for linux/arm64/v8 in the manifest list entries
+
+			Update: To fix: We built the image locally but also pushed an image to 'biphan4/foundry'
+		*/
 		Images: []ibc.DockerImage{
 			{
-				Repository: "foundry",
+
+				Repository: "ghcr.io/foundry-rs/foundry",
 				Version:    "latest",
 				// UidGid:     "1000:1000",
 			},
@@ -145,12 +161,17 @@ func (c *EthereumChain) Bind() []string {
 }
 
 func (c *EthereumChain) pullImages(ctx context.Context, cli *dockerclient.Client) {
+
 	for _, image := range c.Config().Images {
 		rc, err := cli.ImagePull(
 			ctx,
 			image.Repository+":"+image.Version,
 			dockertypes.ImagePullOptions{},
 		)
+		fmt.Println("Pulled images\n")
+		fmt.Println(image.Repository)
+		fmt.Println(image.Version)
+
 		if err != nil {
 			c.log.Error("Failed to pull image",
 				zap.Error(err),
@@ -162,6 +183,7 @@ func (c *EthereumChain) pullImages(ctx context.Context, cli *dockerclient.Client
 			_ = rc.Close()
 		}
 	}
+
 }
 
 func (c *EthereumChain) Start(testName string, ctx context.Context, additionalGenesisWallets ...ibc.WalletAmount) error {
@@ -193,7 +215,7 @@ func (c *EthereumChain) Start(testName string, ctx context.Context, additionalGe
 	// Might need mounts later, but 'deactivate' for now
 	c.log.Info(fmt.Sprintf("%v", mounts))
 
-	err := c.containerLifecycle.CreateContainer(ctx, c.testName, c.NetworkID, c.cfg.Images[0], natPorts, c.Bind(), c.HostName(), cmd)
+	err := c.containerLifecycle.CreateContainerWithMounts(ctx, c.testName, c.NetworkID, c.cfg.Images[0], natPorts, c.Bind(), mounts, c.HostName(), cmd)
 	if err != nil {
 		return err
 	}
@@ -221,13 +243,19 @@ func (c *EthereumChain) HostName() string {
 }
 
 func (c *EthereumChain) Height(ctx context.Context) (uint64, error) {
-	// cmd := []string{"cast", "block-number", "--rpc-url", c.GetRPCAddress()}
-	// stdout, _, err := c.Exec(ctx, cmd, nil)
-	// if err != nil {
-	// 	return 0, err
-	// }
-	// return strconv.ParseInt(strings.TrimSpace(string(stdout)), 10, 64)
-	return 0, nil
+	cmd := []string{"cast", "block-number", "--rpc-url", c.GetRPCAddress()}
+	stdout, _, err := c.Exec(ctx, cmd, nil)
+	if err != nil {
+		return 0, err
+	}
+	// Parse the result as an int64 first
+	height, err := strconv.ParseInt(strings.TrimSpace(string(stdout)), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	// Cast to uint64 before returning
+	return uint64(height), nil
 }
 
 // Get address of account, cast to a string to use
@@ -239,4 +267,31 @@ func (c *EthereumChain) GetAddress(ctx context.Context, keyName string) ([]byte,
 		return nil, err
 	}
 	return []byte(strings.TrimSpace(string(stdout))), nil
+}
+
+func (c *EthereumChain) BuildWallet(ctx context.Context, keyName string, mnemonic string) (ibc.Wallet, error) {
+	if mnemonic != "" {
+		err := c.RecoverKey(ctx, keyName, mnemonic)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// Use the genesis account
+		if keyName == "faucet" {
+			// TODO: implement RecoverKey() so faucet can be saved to keystore
+			return c.genesisWallets.GetFaucetWallet(keyName), nil
+		} else {
+			// Create new account
+			err := c.CreateKey(ctx, keyName)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	address, err := c.GetAddress(ctx, keyName)
+	if err != nil {
+		return nil, err
+	}
+	return NewWallet(keyName, string(address)), nil
 }

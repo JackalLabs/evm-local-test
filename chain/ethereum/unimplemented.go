@@ -67,11 +67,6 @@ func (c *EthereumChain) BuildRelayerWallet(ctx context.Context, keyName string) 
 	return nil, nil
 }
 
-func (c *EthereumChain) BuildWallet(ctx context.Context, keyName string, mnemonic string) (ibc.Wallet, error) {
-	// Placeholder for future implementation
-	return nil, fmt.Errorf("BuildWallet not implemented")
-}
-
 func (c *EthereumChain) CreateKey(ctx context.Context, keyName string) error {
 	// Placeholder for future implementation
 	return fmt.Errorf("CreateKey not implemented")

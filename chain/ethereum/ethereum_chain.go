@@ -66,6 +66,20 @@ func DefaultEthereumAnvilChainConfig(
 		GasAdjustment:  0,
 		TrustingPeriod: "0",
 		NoHostMount:    false,
+
+		/*
+			note: pulling from here failing silently on our m2 studio:
+
+				Manual pulling give this message:
+
+
+					docker pull ghcr.io/foundry-rs/foundry:latest
+
+				latest: Pulling from foundry-rs/foundry
+				no matching manifest for linux/arm64/v8 in the manifest list entries
+
+			Update: To fix: We built the image locally but also pushed an image to 'biphan4/foundry'
+		*/
 		Images: []ibc.DockerImage{
 			{
 

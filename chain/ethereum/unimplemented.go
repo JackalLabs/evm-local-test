@@ -72,11 +72,6 @@ func (c *EthereumChain) CreateKey(ctx context.Context, keyName string) error {
 	return fmt.Errorf("CreateKey not implemented")
 }
 
-func (c *EthereumChain) Exec(ctx context.Context, cmd []string, env []string) (stdout, stderr []byte, err error) {
-	// Placeholder for future implementation
-	return nil, nil, fmt.Errorf("Exec not implemented")
-}
-
 func (c *EthereumChain) GetBalance(ctx context.Context, address string, denom string) (math.Int, error) {
 	// Placeholder for future implementation
 	return math.Int{}, fmt.Errorf("GetBalance not implemented")
@@ -88,9 +83,4 @@ func (c *EthereumChain) GetHostRPCAddress() string {
 
 func (c *EthereumChain) SendFunds(ctx context.Context, keyName string, amount ibc.WalletAmount) error {
 	return fmt.Errorf("SendFunds not implemented")
-}
-
-func (c *EthereumChain) GetRPCAddress() string {
-	// Placeholder for future implementation
-	return ""
 }

@@ -295,3 +295,20 @@ func (c *EthereumChain) BuildWallet(ctx context.Context, keyName string, mnemoni
 	}
 	return NewWallet(keyName, string(address)), nil
 }
+
+func (c *EthereumChain) Exec(ctx context.Context, cmd []string, env []string) (stdout, stderr []byte, err error) {
+	job := dockerutil.NewImage(c.logger(), c.DockerClient, c.NetworkID, c.testName, c.cfg.Images[0].Repository, c.cfg.Images[0].Version)
+	opts := dockerutil.ContainerOptions{
+		Env:   env,
+		Binds: c.Bind(),
+	}
+	res := job.Run(ctx, cmd, opts)
+	return res.Stdout, res.Stderr, res.Err
+}
+
+func (c *EthereumChain) logger() *zap.Logger {
+	return c.log.With(
+		zap.String("chain_id", c.cfg.ChainID),
+		zap.String("test", c.testName),
+	)
+}

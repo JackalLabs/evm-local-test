@@ -1,4 +1,4 @@
-package ethereum_test
+package main
 
 import (
 	"context"

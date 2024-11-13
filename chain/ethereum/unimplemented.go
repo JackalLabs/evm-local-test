@@ -84,8 +84,3 @@ func (c *EthereumChain) GetHostRPCAddress() string {
 func (c *EthereumChain) SendFunds(ctx context.Context, keyName string, amount ibc.WalletAmount) error {
 	return fmt.Errorf("SendFunds not implemented")
 }
-
-func (c *EthereumChain) GetRPCAddress() string {
-	// Placeholder for future implementation
-	return ""
-}

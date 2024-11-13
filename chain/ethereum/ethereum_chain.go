@@ -312,3 +312,7 @@ func (c *EthereumChain) logger() *zap.Logger {
 		zap.String("test", c.testName),
 	)
 }
+
+func (c *EthereumChain) GetRPCAddress() string {
+	return fmt.Sprintf("http://%s:8545", c.HostName())
+}

@@ -72,4 +72,7 @@ func TestEthereum(t *testing.T) {
 	// Sleep for an additional testing
 	time.Sleep(10 * time.Hour)
 
+	// Before we added 'Height' and 'Exec', the test was stalling but Anvil was making blocks
+	// Really good progress now
+
 }

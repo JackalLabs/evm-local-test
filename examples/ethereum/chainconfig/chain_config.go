@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	interchaintest "github.com/strangelove-ventures/interchaintest/v7"
-	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos/wasm"
 	testtypes "github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/types"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
 )
@@ -63,27 +62,27 @@ var genesisAllowICH = map[string]interface{}{
 }
 
 var ChainSpecs = []*interchaintest.ChainSpec{
-	// -- WASMD --
+	// Ethereum
 	{
 		ChainConfig: ibc.ChainConfig{
-			Type:    "cosmos",
-			Name:    "wasmd",
-			ChainID: "localwasm-1",
+			Type:           "ethereum",
+			Name:           "ethereum",
+			ChainID:        "31337", // default anvil chain-id
+			Bech32Prefix:   "n/a",
+			CoinType:       "60",
+			Denom:          "wei",
+			GasPrices:      "0",
+			GasAdjustment:  0,
+			TrustingPeriod: "0",
+			NoHostMount:    false,
 			Images: []ibc.DockerImage{
 				{
-					Repository: "cosmwasm/wasmd", // FOR LOCAL IMAGE USE: Docker Image Name
-					Version:    "v0.45.0",
+					Repository: "ghcr.io/foundry-rs/foundry",
+					Version:    "latest",
+					UidGid:     "1000:1000",
 				},
 			},
-			Bin:           "wasmd",
-			Bech32Prefix:  "wasm",
-			Denom:         "uwsm",
-			GasPrices:     "0.00uwsm",
-			GasAdjustment: 1.3,
-			// cannot run wasmd commands without wasm encoding
-			EncodingConfig: wasm.WasmEncoding(),
-			TrustingPeriod: "508h",
-			NoHostMount:    false,
+			Bin: "anvil",
 		},
 	},
 

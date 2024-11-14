@@ -62,7 +62,7 @@ var genesisAllowICH = map[string]interface{}{
 	},
 }
 
-var chainSpecs = []*interchaintest.ChainSpec{
+var ChainSpecs = []*interchaintest.ChainSpec{
 	// -- WASMD --
 	{
 		ChainConfig: ibc.ChainConfig{

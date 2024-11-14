@@ -1,6 +1,8 @@
 package e2esuite
 
 import (
+	"context"
+
 	dockerclient "github.com/docker/docker/client"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/zap"
@@ -9,7 +11,9 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
 	"github.com/strangelove-ventures/interchaintest/v7/testreporter"
 
+	chainconfig "github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/chainconfig"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
+	logger "github.com/strangelove-ventures/interchaintest/v7/examples/logger"
 )
 
 // Is this a new one or the one that already exists in eigenlayer-deployed-anvil-state.json
@@ -29,5 +33,17 @@ type TestSuite struct {
 
 	// Don't need light clients for now. Only concerned about deploying outpost and
 	// emitting events
+
+}
+
+// SetupSuite sets up the chains, mulberry relayer, user accounts, clients, and connections
+func (s *TestSuite) SetupSuite(ctx context.Context) {
+	logger.InitLogger()
+
+	icChainSpecs := chainconfig.ChainSpecs
+	logger.LogInfo(icChainSpecs)
+
+	// At this step, the ibc team use a case statement to decide whether to boot up a POW or POS Eth chain.
+	// We might need to do this in the future.
 
 }

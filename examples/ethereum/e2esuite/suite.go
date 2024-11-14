@@ -40,8 +40,10 @@ type TestSuite struct {
 func (s *TestSuite) SetupSuite(ctx context.Context) {
 	logger.InitLogger()
 
-	// Don't need this right now
 	icChainSpecs := chainconfig.ChainSpecs
 	logger.LogInfo(icChainSpecs)
+
+	// At this step, the ibc team use a case statement to decide whether to boot up a POW or POS Eth chain.
+	// We might need to do this in the future.
 
 }

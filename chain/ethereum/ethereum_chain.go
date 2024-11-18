@@ -316,3 +316,7 @@ func (c *EthereumChain) logger() *zap.Logger {
 func (c *EthereumChain) GetRPCAddress() string {
 	return fmt.Sprintf("http://%s:8545", c.HostName())
 }
+
+func (c *EthereumChain) GetHostRPCAddress() string {
+	return "http://" + c.hostRPCPort
+}

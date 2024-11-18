@@ -45,7 +45,6 @@ func (s *OutpostTestSuite) TestDummy() {
 
 	canined := s.ChainB
 	fmt.Println(canined)
-	time.Sleep(10 * time.Hour)
 
 	s.Require().True(s.Run("dummy", func() {
 

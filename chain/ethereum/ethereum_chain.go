@@ -128,6 +128,10 @@ func (c *EthereumChain) Initialize(ctx context.Context, testName string, cli *do
 	c.NetworkID = networkID
 	c.DockerClient = cli
 
+	fmt.Println("volume name:", c.VolumeName)
+	fmt.Println("Network ID:", c.NetworkID)
+	fmt.Println("Mount Path:", v.Mountpoint)
+
 	if err := dockerutil.SetVolumeOwner(ctx, dockerutil.VolumeOwnerOptions{
 		Log: c.log,
 

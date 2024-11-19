@@ -110,6 +110,7 @@ func (e Ethereum) ForgeScript(deployer *ecdsa.PrivateKey, solidityContract strin
 	// Set the command's stdout to the MultiWriter
 	cmd.Stdout = multiWriter
 	cmd.Stderr = os.Stderr
+	fmt.Println("The args are", cmd.Args)
 
 	// Run the command
 	if err := cmd.Run(); err != nil {

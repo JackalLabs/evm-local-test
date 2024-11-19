@@ -128,6 +128,10 @@ func (c *EthereumChain) Initialize(ctx context.Context, testName string, cli *do
 	c.NetworkID = networkID
 	c.DockerClient = cli
 
+	fmt.Println("volume name:", c.VolumeName)
+	fmt.Println("Network ID:", c.NetworkID)
+	fmt.Println("Mount Path:", v.Mountpoint)
+
 	if err := dockerutil.SetVolumeOwner(ctx, dockerutil.VolumeOwnerOptions{
 		Log: c.log,
 
@@ -157,7 +161,10 @@ func (c *EthereumChain) KeystoreDir() string {
 }
 
 func (c *EthereumChain) Bind() []string {
-	return []string{fmt.Sprintf("%s:%s", c.VolumeName, c.HomeDir())}
+	return []string{
+		fmt.Sprintf("%s:%s", c.VolumeName, c.HomeDir()),
+		"/Users/biphan/jackal/ict-evm/examples/ethereum/scripts:/home/foundry/scripts",
+	}
 }
 
 func (c *EthereumChain) pullImages(ctx context.Context, cli *dockerclient.Client) {
@@ -315,4 +322,8 @@ func (c *EthereumChain) logger() *zap.Logger {
 
 func (c *EthereumChain) GetRPCAddress() string {
 	return fmt.Sprintf("http://%s:8545", c.HostName())
+}
+
+func (c *EthereumChain) GetHostRPCAddress() string {
+	return "http://" + c.hostRPCPort
 }

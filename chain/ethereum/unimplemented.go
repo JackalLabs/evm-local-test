@@ -77,10 +77,6 @@ func (c *EthereumChain) GetBalance(ctx context.Context, address string, denom st
 	return math.Int{}, fmt.Errorf("GetBalance not implemented")
 }
 
-func (c *EthereumChain) GetHostRPCAddress() string {
-	return ""
-}
-
 func (c *EthereumChain) SendFunds(ctx context.Context, keyName string, amount ibc.WalletAmount) error {
 	return fmt.Errorf("SendFunds not implemented")
 }

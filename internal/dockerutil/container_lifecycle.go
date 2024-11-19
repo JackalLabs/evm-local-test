@@ -60,6 +60,7 @@ func (c *ContainerLifecycle) CreateContainerWithMounts(
 
 	c.preStartListeners = listeners
 
+	fmt.Println("volume binds:", volumeBinds[0])
 	cc, err := c.client.ContainerCreate(
 		ctx,
 		&container.Config{

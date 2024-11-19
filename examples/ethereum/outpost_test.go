@@ -59,9 +59,10 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 			err    error
 		)
 
-		stdout, err = eth.ForgeScript(s.deployer, "scripts/SimpleStorage.s.sol")
-		s.Require().NoError(err)
+		// note: can't just pick a name--need actual name of contract. This is case sensitive
+		stdout, err = eth.ForgeScript(s.deployer, "scripts/SimpleStorage.s.sol:SimpleStorage")
 		fmt.Println(stdout)
+		fmt.Println(err)
 		fmt.Println("****deployment complete****")
 
 	}))

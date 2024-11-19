@@ -163,7 +163,7 @@ func (c *EthereumChain) KeystoreDir() string {
 func (c *EthereumChain) Bind() []string {
 	return []string{
 		fmt.Sprintf("%s:%s", c.VolumeName, c.HomeDir()),
-		"/Users/biphan/jackcal/ict-evm/examples/ethereum/scripts:/home/foundry/scripts",
+		"/Users/biphan/jackal/ict-evm/examples/ethereum/scripts:/home/foundry/scripts",
 	}
 }
 

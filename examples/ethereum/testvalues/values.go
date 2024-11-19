@@ -46,7 +46,7 @@ const (
 	// EnvKeyEthTestnetType The Ethereum testnet type (pow|pos).
 	EnvKeyEthTestnetType = "ETH_TESTNET_TYPE"
 	// EnvE2EFacuetAddress The address of the faucet
-	EnvKeyE2EFacuetAddress = "E2E_FAUCET_ADDRESS"
+	EnvKeyE2EFaucetAddress = "E2E_FAUCET_ADDRESS"
 
 	// Sp1GenesisFilePath is the path to the genesis file for the SP1 chain.
 	// This file is generated and then deleted by the test.

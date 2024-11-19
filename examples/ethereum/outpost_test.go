@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -33,6 +34,37 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 	fmt.Println(eth)
 	fmt.Println(canined)
 
+	s.Require().True(s.Run("Set up environment", func() {
+		err := os.Chdir("../..") // Change directories for what?
+		s.Require().NoError(err)
+
+		s.key, err = eth.CreateAndFundUser()
+		s.Require().NoError(err)
+
+		operatorKey, err := eth.CreateAndFundUser()
+		fmt.Println(operatorKey)
+		s.Require().NoError(err)
+
+		s.deployer, err = eth.CreateAndFundUser()
+		s.Require().NoError(err)
+
+	}))
+
+	s.Require().True(s.Run("Deploy ethereum contracts", func() {
+		// seems the operator key is for supporting proofs
+		// we're not running proofs atm
+
+		var (
+			stdout []byte
+			err    error
+		)
+
+		stdout, err = eth.ForgeScript(s.deployer, "scripts/SimpleStorage.s.sol")
+		s.Require().NoError(err)
+		fmt.Println(stdout)
+		fmt.Println("****deployment complete****")
+
+	}))
 }
 
 func TestWithOutpostTestSuite(t *testing.T) {

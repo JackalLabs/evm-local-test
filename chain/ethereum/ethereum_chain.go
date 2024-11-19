@@ -161,7 +161,10 @@ func (c *EthereumChain) KeystoreDir() string {
 }
 
 func (c *EthereumChain) Bind() []string {
-	return []string{fmt.Sprintf("%s:%s", c.VolumeName, c.HomeDir())}
+	return []string{
+		fmt.Sprintf("%s:%s", c.VolumeName, c.HomeDir()),
+		"/Users/biphan/jackcal/ict-evm/examples/ethereum/scripts:/home/foundry/scripts",
+	}
 }
 
 func (c *EthereumChain) pullImages(ctx context.Context, cli *dockerclient.Client) {

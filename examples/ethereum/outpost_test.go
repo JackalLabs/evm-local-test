@@ -5,6 +5,7 @@ import (
 	"crypto/ecdsa"
 	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -60,7 +61,21 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 		)
 
 		// note: can't just pick a name--need actual name of contract. This is case sensitive
-		stdout, err = eth.ForgeScript(s.deployer, "scripts/SimpleStorage.s.sol:SimpleStorage")
+
+		/* NOTE:
+		We ran the command:
+		forge script --rpc-url http://127.0.0.1:52078 --broadcast --non-interactive
+		-vvvv /Users/biphan/jackal/ict-evm/examples/ethereum/scripts/SimpleStorage.s.sol:SimpleStorage
+
+		in our local terminal and it worked
+		This means the 'ForgeScript' function is actually targeting our local file system,
+		which means creating a mount bind between local scripts directory and the container was pointless?
+		*/
+
+		dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
+		pathOfScripts := filepath.Join(dir, "examples/ethereum/scripts/SimpleStorage.s.sol:SimpleStorage")
+
+		stdout, err = eth.ForgeScript(s.deployer, pathOfScripts)
 		fmt.Println(stdout)
 		fmt.Println(err)
 		fmt.Println("****deployment complete****")

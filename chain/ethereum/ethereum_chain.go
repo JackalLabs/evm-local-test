@@ -161,9 +161,18 @@ func (c *EthereumChain) KeystoreDir() string {
 }
 
 func (c *EthereumChain) Bind() []string {
+
+	// TODO: need to make this more reproducable for production
+
+	// NOTE: right now, the tests are run from within: ict-evm/examples/ethereum
+	// If this remains the same in production, is it better to use the relative path '.'?
+
+	dir, _ := os.Getwd()
+	pathOfScripts := filepath.Join(dir, "scripts")
+
 	return []string{
 		fmt.Sprintf("%s:%s", c.VolumeName, c.HomeDir()),
-		"/Users/biphan/jackal/ict-evm/examples/ethereum/scripts:/home/foundry/scripts",
+		fmt.Sprintf("%s:/home/foundry/scripts", pathOfScripts),
 	}
 }
 

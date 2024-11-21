@@ -5,6 +5,7 @@ import (
 	"crypto/ecdsa"
 	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -71,7 +72,10 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 		which means creating a mount bind between local scripts directory and the container was pointless?
 		*/
 
-		stdout, err = eth.ForgeScript(s.deployer, "/home/foundry/scripts/SimpleStorage.s.sol:SimpleStorage")
+		dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
+		pathOfScripts := filepath.Join(dir, "examples/ethereum/scripts/SimpleStorage.s.sol:SimpleStorage")
+
+		stdout, err = eth.ForgeScript(s.deployer, pathOfScripts)
 		fmt.Println(stdout)
 		fmt.Println(err)
 		fmt.Println("****deployment complete****")

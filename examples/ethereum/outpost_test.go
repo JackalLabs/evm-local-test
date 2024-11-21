@@ -61,7 +61,16 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 
 		// note: can't just pick a name--need actual name of contract. This is case sensitive
 
-		// NOTE: need to run the below
+		/* NOTE:
+		We ran the command:
+		forge script --rpc-url http://127.0.0.1:52078 --broadcast --non-interactive
+		-vvvv /Users/biphan/jackal/ict-evm/examples/ethereum/scripts/SimpleStorage.s.sol:SimpleStorage
+
+		in our local terminal and it worked
+		This means the 'ForgeScript' function is actually targeting our local file system,
+		which means creating a mount bind between local scripts directory and the container was pointless?
+		*/
+
 		stdout, err = eth.ForgeScript(s.deployer, "/home/foundry/scripts/SimpleStorage.s.sol:SimpleStorage")
 		fmt.Println(stdout)
 		fmt.Println(err)

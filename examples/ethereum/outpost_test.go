@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -29,6 +30,16 @@ type OutpostTestSuite struct {
 }
 
 func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
+
+	// using local image for now
+	image := "biphan4/mulberry:0.0.6"
+	if err := e2esuite.PullMulberryImage(image); err != nil {
+		log.Fatalf("Error pulling Docker image: %v", err)
+	}
+
+	fmt.Println("finished pulling mulberry")
+	time.Sleep(10 * time.Hour)
+
 	s.TestSuite.SetupSuite(ctx)
 
 	eth, canined := s.ChainA, s.ChainB

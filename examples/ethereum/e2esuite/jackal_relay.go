@@ -11,7 +11,7 @@ import (
 )
 
 // Utility for pulling and using an image of mulberry
-func PullImage(image string) error {
+func PullMulberryImage(image string) error {
 	// Create a Docker client
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {

@@ -62,10 +62,10 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 	}
 
 	// Start Mulberry
-	startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}
-	if err := e2esuite.ExecCommandInContainer(containerID, startCommand); err != nil {
-		log.Fatalf("Error starting mulberry in container: %v", err)
-	}
+	// startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}
+	// if err := e2esuite.ExecCommandInContainer(containerID, startCommand); err != nil {
+	// 	log.Fatalf("Error starting mulberry in container: %v", err)
+	// }
 
 	// NOTE: I'm paranoid and not 100% convinced these commands are executing inside the containe, once the contract actually start emitting events
 	// We will see whether the relayer can pick it up
@@ -73,9 +73,6 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 	// Need an elegant way to modify mulberry's config to point to the anvil and canine-chain end points after they're spun up
 	// Perhaps that's the next task
 	// Before deploying the contract
-
-	fmt.Println("Mulberry running?")
-	time.Sleep(10 * time.Hour)
 
 	s.TestSuite.SetupSuite(ctx)
 

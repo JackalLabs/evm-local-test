@@ -76,3 +76,41 @@ func RunContainer(image string, containerName string) (string, error) {
 	fmt.Printf("Container started with ID: %s\n", resp.ID)
 	return resp.ID, nil
 }
+
+// ExecCommandInContainer executes a command inside a running container
+func ExecCommandInContainer(containerID string, command []string) error {
+	// Create a Docker client
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return fmt.Errorf("failed to create Docker client: %w", err)
+	}
+
+	// Context for the Docker API calls
+	ctx := context.Background()
+
+	// Create an exec instance in the container
+	execConfig := types.ExecConfig{
+		Cmd:          command,
+		AttachStdout: true,
+		AttachStderr: true,
+	}
+	execIDResp, err := cli.ContainerExecCreate(ctx, containerID, execConfig)
+	if err != nil {
+		return fmt.Errorf("failed to create exec instance: %w", err)
+	}
+
+	// Start the exec process
+	resp, err := cli.ContainerExecAttach(ctx, execIDResp.ID, types.ExecStartCheck{})
+	if err != nil {
+		return fmt.Errorf("failed to attach to exec instance: %w", err)
+	}
+	defer resp.Close()
+
+	// Stream the command output
+	if _, err := io.Copy(os.Stdout, resp.Reader); err != nil {
+		return fmt.Errorf("failed to read exec output: %w", err)
+	}
+
+	return nil
+
+}

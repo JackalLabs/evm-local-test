@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"gopkg.in/yaml.v2"
 )
 
 // Utility for pulling and using an image of mulberry
@@ -135,4 +136,42 @@ func StreamContainerLogs(containerID string) error {
 
 	_, err = io.Copy(os.Stdout, out) // Stream logs to the local terminal
 	return err
+}
+
+func updateMulberryConfigRPC(configPath, networkName, newRPC string) error {
+	// Open the YAML file
+	file, err := os.Open(configPath)
+	if err != nil {
+		return fmt.Errorf("failed to open config file: %w", err)
+	}
+	defer file.Close()
+
+	// Decode YAML into a struct
+	var config MulberryConfig
+	decoder := yaml.NewDecoder(file)
+	if err := decoder.Decode(&config); err != nil {
+		return fmt.Errorf("failed to decode config file: %w", err)
+	}
+
+	// Update the RPC address for the specified network
+	for i, network := range config.NetworksConfig {
+		if network.Name == networkName {
+			config.NetworksConfig[i].RPC = newRPC
+			break
+		}
+	}
+
+	// Write the updated config back to the file
+	file, err = os.Create(configPath) // Truncate and overwrite the file
+	if err != nil {
+		return fmt.Errorf("failed to write to config file: %w", err)
+	}
+	defer file.Close()
+
+	encoder := yaml.NewEncoder(file)
+	if err := encoder.Encode(&config); err != nil {
+		return fmt.Errorf("failed to encode updated config: %w", err)
+	}
+
+	return nil
 }

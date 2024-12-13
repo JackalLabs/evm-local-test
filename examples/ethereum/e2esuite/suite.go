@@ -131,6 +131,14 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 
 	logger.LogInfo("host rpc address: %s\n", anvil.GetHostRPCAddress())
 
+	// Update the YAML file
+	rpcAddress := anvil.GetHostRPCAddress()
+	if err := updateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress); err != nil {
+		log.Fatalf("Failed to update mulberry config: %v", err)
+	}
+
+	log.Printf("Updated mulberry config with RPC address: %s\n", rpcAddress)
+
 	// TODO: fund jkl users
 	// TODO: make a map of proposal IDs?
 
@@ -139,5 +147,7 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	if err := ExecCommandInContainer(containerID, startCommand); err != nil {
 		log.Fatalf("Error starting mulberry in container: %v", err)
 	}
+
+	// NOTE: it connected to RPC fine but looks like local anvil web socket is not exposed
 
 }

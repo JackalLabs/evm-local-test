@@ -1,11 +1,11 @@
 jackal_config:
-    rpc: https://custom-rpc.jackalprotocol.com
-    grpc: custom-grpc.polkachu.com:17590
-    seed_file: seed.json
-    contract: jkl1customcontractaddress
+  rpc: https://custom-rpc.jackalprotocol.com
+  grpc: custom-grpc.polkachu.com:17590
+  seed_file: seed.json
+  contract: jkl1customcontractaddress
 networks_config:
-    - name: Ethereum Sepolia
-      rpc: wss://custom-ethereum-sepolia-rpc.publicnode.com
-      contract: 0xCustomContractAddress
-      chain_id: 11155111
-      finality: 2
+- name: Ethereum Sepolia
+  rpc: http://127.0.0.1:52517
+  contract: 0xCustomContractAddress
+  chain_id: 11155111
+  finality: 2

@@ -48,9 +48,15 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 	log.Printf("Container is running with ID: %s\n", containerID)
 
 	// Execute a command inside the container
-	command := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}
-	if err := e2esuite.ExecCommandInContainer(containerID, command); err != nil {
-		log.Fatalf("Error executing command in container: %v", err)
+	addressCommand := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}
+	if err := e2esuite.ExecCommandInContainer(containerID, addressCommand); err != nil {
+		log.Fatalf("Error creating wallet address in container: %v", err)
+	}
+
+	// Start Mulberry
+	startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}
+	if err := e2esuite.ExecCommandInContainer(containerID, startCommand); err != nil {
+		log.Fatalf("Error starting mulberry in container: %v", err)
 	}
 
 	fmt.Println("Mulberry running?")

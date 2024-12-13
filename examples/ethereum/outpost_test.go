@@ -37,7 +37,17 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 		log.Fatalf("Error pulling Docker image: %v", err)
 	}
 
-	fmt.Println("finished pulling mulberry")
+	containerName := "mulberry_test_container"
+
+	// Run the container
+	containerID, err := e2esuite.RunContainer(image, containerName)
+	if err != nil {
+		log.Fatalf("Error running container: %v", err)
+	}
+
+	log.Printf("Container is running with ID: %s\n", containerID)
+
+	fmt.Println("Mulberry running?")
 	time.Sleep(10 * time.Hour)
 
 	s.TestSuite.SetupSuite(ctx)

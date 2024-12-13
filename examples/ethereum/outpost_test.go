@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -29,6 +30,40 @@ type OutpostTestSuite struct {
 }
 
 func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
+
+	// using local image for now
+	image := "biphan4/mulberry:0.0.6"
+	if err := e2esuite.PullMulberryImage(image); err != nil {
+		log.Fatalf("Error pulling Docker image: %v", err)
+	}
+
+	containerName := "mulberry_test_container"
+
+	// Run the container
+	containerID, err := e2esuite.RunContainer(image, containerName)
+	if err != nil {
+		log.Fatalf("Error running container: %v", err)
+	}
+
+	log.Printf("Container is running with ID: %s\n", containerID)
+
+	go e2esuite.StreamContainerLogs(containerID)
+
+	// Execute a command inside the container
+	addressCommand := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}
+	if err := e2esuite.ExecCommandInContainer(containerID, addressCommand); err != nil {
+		log.Fatalf("Error creating wallet address in container: %v", err)
+	}
+
+	// Start Mulberry
+	startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}
+	if err := e2esuite.ExecCommandInContainer(containerID, startCommand); err != nil {
+		log.Fatalf("Error starting mulberry in container: %v", err)
+	}
+
+	fmt.Println("Mulberry running?")
+	time.Sleep(10 * time.Hour)
+
 	s.TestSuite.SetupSuite(ctx)
 
 	eth, canined := s.ChainA, s.ChainB

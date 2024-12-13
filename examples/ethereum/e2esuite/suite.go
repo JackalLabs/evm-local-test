@@ -81,11 +81,15 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	// Easier/faster than making function(s) for jackal queries?
 
 	anvil := chains[0].(*ictethereum.EthereumChain)
+
 	faucet, err := crypto.ToECDSA(ethcommon.FromHex(anvilFaucetPrivateKey))
 	s.Require().NoError(err)
 
 	s.ChainA, err = eth.NewEthereum(ctx, anvil.GetHostRPCAddress(), faucet)
 	s.Require().NoError(err)
+
+	// log
+	logger.LogInfo("host rpc address: %s\n", anvil.GetHostRPCAddress())
 
 	// TODO: fund jkl users
 	// TODO: make a map of proposal IDs?

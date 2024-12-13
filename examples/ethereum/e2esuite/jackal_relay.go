@@ -39,7 +39,7 @@ func PullMulberryImage(image string) error {
 }
 
 // RunContainer creates and starts a container from the given image.
-func RunContainer(image string, containerName string) (string, error) {
+func RunContainerWithConfig(image string, containerName string, localConfigPath string) (string, error) {
 	// Create a Docker client
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -58,6 +58,9 @@ func RunContainer(image string, containerName string) (string, error) {
 			Cmd: []string{"sleep", "3600"}, // Example: long-running command
 		},
 		&container.HostConfig{
+			Binds: []string{
+				fmt.Sprintf("%s:/root/.mulberry/config.yaml", localConfigPath),
+			},
 			AutoRemove: true, // Automatically remove container after it stops
 		},
 		nil, // NetworkingConfig

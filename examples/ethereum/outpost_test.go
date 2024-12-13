@@ -47,6 +47,12 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 
 	log.Printf("Container is running with ID: %s\n", containerID)
 
+	// Execute a command inside the container
+	command := []string{"echo", "Hello from inside the container!"}
+	if err := e2esuite.ExecCommandInContainer(containerID, command); err != nil {
+		log.Fatalf("Error executing command in container: %v", err)
+	}
+
 	fmt.Println("Mulberry running?")
 	time.Sleep(10 * time.Hour)
 

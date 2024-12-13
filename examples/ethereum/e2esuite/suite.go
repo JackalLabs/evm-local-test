@@ -2,6 +2,8 @@ package e2esuite
 
 import (
 	"context"
+	"log"
+	"path/filepath"
 
 	dockerclient "github.com/docker/docker/client"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -88,10 +90,54 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	s.ChainA, err = eth.NewEthereum(ctx, anvil.GetHostRPCAddress(), faucet)
 	s.Require().NoError(err)
 
-	// log
+	// Set up Mulberry
+
+	// using local image for now
+	image := "biphan4/mulberry:0.0.6"
+	if err := PullMulberryImage(image); err != nil {
+		log.Fatalf("Error pulling Docker image: %v", err)
+	}
+
+	containerName := "mulberry_test_container"
+
+	// Get the absolute path of the local config file
+	localConfigPath, err := filepath.Abs("e2esuite/mulberry_config.yaml")
+	if err != nil {
+		log.Fatalf("failed to resolve config path: %v", err)
+	}
+
+	// Run the container
+	containerID, err := RunContainerWithConfig(image, containerName, localConfigPath)
+	if err != nil {
+		log.Fatalf("Error running container: %v", err)
+	}
+
+	log.Printf("Container is running with ID: %s\n", containerID)
+
+	go StreamContainerLogs(containerID)
+
+	// Execute a command inside the container
+	addressCommand := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}
+	if err := ExecCommandInContainer(containerID, addressCommand); err != nil {
+		log.Fatalf("Error creating wallet address in container: %v", err)
+	}
+
+	// NOTE: I'm paranoid and not 100% convinced these commands are executing inside the containe, once the contract actually start emitting events
+	// We will see whether the relayer can pick it up
+
+	// Need an elegant way to modify mulberry's config to point to the anvil and canine-chain end points after they're spun up
+	// Perhaps that's the next task
+	// Before deploying the contract
+
 	logger.LogInfo("host rpc address: %s\n", anvil.GetHostRPCAddress())
 
 	// TODO: fund jkl users
 	// TODO: make a map of proposal IDs?
+
+	// Start Mulberry
+	startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}
+	if err := ExecCommandInContainer(containerID, startCommand); err != nil {
+		log.Fatalf("Error starting mulberry in container: %v", err)
+	}
 
 }

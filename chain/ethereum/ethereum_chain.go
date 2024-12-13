@@ -209,6 +209,7 @@ func (c *EthereumChain) Start(testName string, ctx context.Context, additionalGe
 		"--block-time", "2", // 2 second block times
 		"--accounts", "10", // We currently only use the first account for the faucet, but tests may expect the default
 		"--balance", "10000000", // Genesis accounts loaded with 10mil ether, change as needed
+		"--ws-port", "8546", // Expose web socket
 	}
 
 	var mounts []mount.Mount

@@ -9,8 +9,3 @@ networks_config:
       contract: 0xCustomContractAddress
       chain_id: 11155111
       finality: 2
-    - name: Base Sepolia
-      rpc: wss://custom-base-sepolia-rpc.publicnode.com
-      contract: 0xAnotherCustomContractAddress
-      chain_id: 84532
-      finality: 2

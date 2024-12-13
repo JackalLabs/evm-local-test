@@ -47,6 +47,8 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 
 	log.Printf("Container is running with ID: %s\n", containerID)
 
+	go e2esuite.StreamContainerLogs(containerID)
+
 	// Execute a command inside the container
 	addressCommand := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}
 	if err := e2esuite.ExecCommandInContainer(containerID, addressCommand); err != nil {

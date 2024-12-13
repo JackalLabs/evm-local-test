@@ -114,3 +114,22 @@ func ExecCommandInContainer(containerID string, command []string) error {
 	return nil
 
 }
+
+func StreamContainerLogs(containerID string) error {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return fmt.Errorf("failed to create Docker client: %w", err)
+	}
+
+	ctx := context.Background()
+	options := types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true}
+
+	out, err := cli.ContainerLogs(ctx, containerID, options)
+	if err != nil {
+		return fmt.Errorf("failed to fetch container logs: %w", err)
+	}
+	defer out.Close()
+
+	_, err = io.Copy(os.Stdout, out) // Stream logs to the local terminal
+	return err
+}

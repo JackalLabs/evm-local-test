@@ -12,9 +12,7 @@ import (
 // NOTE: We don't need wasmd right now, but we're leaving it as a placeholder
 
 var genesisAllowICH = map[string]interface{}{
-
 	"interchainaccounts": map[string]interface{}{
-
 		"controller_genesis_state": map[string]interface{}{
 			"active_channels":     []interface{}{},
 			"interchain_accounts": []interface{}{},
@@ -35,7 +33,6 @@ var genesisAllowICH = map[string]interface{}{
 		},
 	},
 	"storage": map[string]interface{}{
-
 		"active_providers_list": []interface{}{},
 		"attest_forms":          []interface{}{},
 		"collateral_list":       []interface{}{},
@@ -94,8 +91,8 @@ var ChainSpecs = []*interchaintest.ChainSpec{
 			ChainID: "puppy-1",
 			Images: []ibc.DockerImage{
 				{
-					Repository: "jackallabs/canined", // FOR LOCAL IMAGE USE: Docker Image Name
-					Version:    "canary",             // FOR LOCAL IMAGE USE: Docker Image Tag
+					Repository: "biphan4/canine-chain", // FOR LOCAL IMAGE USE: Docker Image Name
+					Version:    "0.0.21",               // FOR LOCAL IMAGE USE: Docker Image Tag
 				},
 			},
 			Bin:            "canined",
@@ -118,7 +115,7 @@ func modifyGenesisAtPath(insertedBlock map[string]interface{}, key string) func(
 			return nil, fmt.Errorf("failed to unmarshal genesis file: %w", err)
 		}
 
-		//Get the section of the genesis file under the given key (e.g. "app_state")
+		// Get the section of the genesis file under the given key (e.g. "app_state")
 		app_state, ok := g[key].(map[string]interface{})
 		if !ok {
 			return nil, fmt.Errorf("genesis json does not have top level key: %s", key)

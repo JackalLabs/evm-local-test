@@ -25,7 +25,6 @@ type VolumeOwnerOptions struct {
 
 // SetVolumeOwner configures the owner of a volume to match the default user in the supplied image reference.
 func SetVolumeOwner(ctx context.Context, opts VolumeOwnerOptions) error {
-	fmt.Println("SETTING OWNER?")
 	owner := opts.UidGid
 	if owner == "" {
 		owner = GetRootUserString()
@@ -105,6 +104,6 @@ func SetVolumeOwner(ctx context.Context, opts VolumeOwnerOptions) error {
 			return fmt.Errorf("configuring volume exited %d", res.StatusCode)
 		}
 	}
-	fmt.Println("containers created?")
+
 	return nil
 }

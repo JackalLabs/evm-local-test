@@ -83,7 +83,6 @@ func DefaultEthereumAnvilChainConfig(
 		*/
 		Images: []ibc.DockerImage{
 			{
-
 				Repository: "ghcr.io/foundry-rs/foundry",
 				Version:    "latest",
 				// UidGid:     "1000:1000",
@@ -161,7 +160,6 @@ func (c *EthereumChain) KeystoreDir() string {
 }
 
 func (c *EthereumChain) Bind() []string {
-
 	// TODO: need to make this more reproducable for production
 
 	// NOTE: right now, the tests are run from within: ict-evm/examples/ethereum
@@ -177,7 +175,6 @@ func (c *EthereumChain) Bind() []string {
 }
 
 func (c *EthereumChain) pullImages(ctx context.Context, cli *dockerclient.Client) {
-
 	for _, image := range c.Config().Images {
 		rc, err := cli.ImagePull(
 			ctx,
@@ -199,17 +196,15 @@ func (c *EthereumChain) pullImages(ctx context.Context, cli *dockerclient.Client
 			_ = rc.Close()
 		}
 	}
-
 }
 
 func (c *EthereumChain) Start(testName string, ctx context.Context, additionalGenesisWallets ...ibc.WalletAmount) error {
-
-	cmd := []string{c.cfg.Bin,
+	cmd := []string{
+		c.cfg.Bin,
 		"--host", "0.0.0.0", // Anyone can call
 		"--block-time", "2", // 2 second block times
 		"--accounts", "10", // We currently only use the first account for the faucet, but tests may expect the default
 		"--balance", "10000000", // Genesis accounts loaded with 10mil ether, change as needed
-		"--ws-port", "8546", // Expose web socket
 	}
 
 	var mounts []mount.Mount
@@ -252,7 +247,6 @@ func (c *EthereumChain) Start(testName string, ctx context.Context, additionalGe
 	fmt.Println("Host RPC port: ", c.hostRPCPort)
 
 	return testutil.WaitForBlocks(ctx, 2, c)
-
 }
 
 func (c *EthereumChain) HostName() string {
@@ -277,7 +271,6 @@ func (c *EthereumChain) Height(ctx context.Context) (uint64, error) {
 
 // Get address of account, cast to a string to use
 func (c *EthereumChain) GetAddress(ctx context.Context, keyName string) ([]byte, error) {
-
 	cmd := []string{"cast", "wallet", "address", "--keystore", c.keystoreMap[keyName], "--password", ""}
 	stdout, _, err := c.Exec(ctx, cmd, nil)
 	if err != nil {

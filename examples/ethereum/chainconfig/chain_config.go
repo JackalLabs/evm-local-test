@@ -73,7 +73,7 @@ var ChainSpecs = []*interchaintest.ChainSpec{
 			NoHostMount:    false,
 			Images: []ibc.DockerImage{
 				{
-					Repository: "ghcr.io/foundry-rs/foundry",
+					Repository: "biphan4/foundry",
 					Version:    "latest",
 					UidGid:     "1000:1000",
 				},

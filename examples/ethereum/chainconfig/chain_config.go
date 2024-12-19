@@ -91,9 +91,10 @@ var ChainSpecs = []*interchaintest.ChainSpec{
 			ChainID: "puppy-1",
 			Images: []ibc.DockerImage{
 				{
-					Repository: "biphan4/canine-chain", // FOR LOCAL IMAGE USE: Docker Image Name
-					Version:    "0.0.21",               // FOR LOCAL IMAGE USE: Docker Image Tag
-				},
+					Repository: "biphan4/canine-evm", // FOR LOCAL IMAGE USE: Docker Image Name
+					Version:    "0.0.0",              // FOR LOCAL IMAGE USE: Docker Image Tag
+				}, // NOTE: Jackal Labs canary version atleast returns an error,
+				// Every other version just stalls out
 			},
 			Bin:            "canined",
 			Bech32Prefix:   "jkl",

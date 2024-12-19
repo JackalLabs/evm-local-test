@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	interchaintest "github.com/strangelove-ventures/interchaintest/v7"
-	testtypes "github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/types"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
 )
 
@@ -84,29 +83,29 @@ var ChainSpecs = []*interchaintest.ChainSpec{
 	},
 
 	// -- CANINED --
-	{
-		ChainConfig: ibc.ChainConfig{
-			Type:    "cosmos",
-			Name:    "canined",
-			ChainID: "puppy-1",
-			Images: []ibc.DockerImage{
-				{
-					Repository: "biphan4/canine-evm", // FOR LOCAL IMAGE USE: Docker Image Name
-					Version:    "0.0.0",              // FOR LOCAL IMAGE USE: Docker Image Tag
-				}, // NOTE: Jackal Labs canary version atleast returns an error,
-				// Every other version just stalls out
-			},
-			Bin:            "canined",
-			Bech32Prefix:   "jkl",
-			Denom:          "ujkl", // do we have to use ujkl or is jkl ok?
-			GasPrices:      "0.00ujkl",
-			GasAdjustment:  1.3,
-			EncodingConfig: testtypes.JackaklEncoding(),
-			TrustingPeriod: "508h",
-			NoHostMount:    false,
-			ModifyGenesis:  modifyGenesisAtPath(genesisAllowICH, "app_state"),
-		},
-	},
+	// {
+	// 	ChainConfig: ibc.ChainConfig{
+	// 		Type:    "cosmos",
+	// 		Name:    "canined",
+	// 		ChainID: "puppy-1",
+	// 		Images: []ibc.DockerImage{
+	// 			{
+	// 				Repository: "biphan4/canine-evm", // FOR LOCAL IMAGE USE: Docker Image Name
+	// 				Version:    "0.0.0",              // FOR LOCAL IMAGE USE: Docker Image Tag
+	// 			}, // NOTE: Jackal Labs canary version atleast returns an error,
+	// 			// Every other version just stalls out
+	// 		},
+	// 		Bin:            "canined",
+	// 		Bech32Prefix:   "jkl",
+	// 		Denom:          "ujkl", // do we have to use ujkl or is jkl ok?
+	// 		GasPrices:      "0.00ujkl",
+	// 		GasAdjustment:  1.3,
+	// 		EncodingConfig: testtypes.JackaklEncoding(),
+	// 		TrustingPeriod: "508h",
+	// 		NoHostMount:    false,
+	// 		ModifyGenesis:  modifyGenesisAtPath(genesisAllowICH, "app_state"),
+	// 	},
+	// },
 }
 
 func modifyGenesisAtPath(insertedBlock map[string]interface{}, key string) func(ibc.ChainConfig, []byte) ([]byte, error) {

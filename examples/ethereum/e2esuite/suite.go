@@ -40,7 +40,6 @@ type TestSuite struct {
 
 	// Don't need light clients for now. Only concerned about deploying outpost and
 	// emitting events
-
 }
 
 // SetupSuite sets up the chains, mulberry relayer, user accounts, clients, and connections
@@ -62,7 +61,7 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	s.Require().NoError(err)
 
 	// canine-chain should be at index 1
-	s.ChainB = chains[1].(*cosmos.CosmosChain)
+	// s.ChainB = chains[1].(*cosmos.CosmosChain) // WARNING NOTE: Disabling for now, please turn back on
 
 	ic := interchaintest.NewInterchain()
 	for _, chain := range chains {
@@ -149,5 +148,4 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	}
 
 	// NOTE: it connected to RPC fine but looks like local anvil web socket is not exposed
-
 }

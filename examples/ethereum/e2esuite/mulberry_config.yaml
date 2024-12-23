@@ -5,7 +5,7 @@ jackal_config:
   contract: jkl1customcontractaddress
 networks_config:
 - name: Ethereum Sepolia
-  rpc: http://127.0.0.1:52517
+  rpc: ws://127.0.0.1:8545
   contract: 0xCustomContractAddress
   chain_id: 11155111
   finality: 2

@@ -25,7 +25,7 @@ type Ethereum struct {
 	ChainID *big.Int
 	RPC     string
 	EthAPI  EthAPI
-	//BeaconAPIClient *BeaconAPIClient	NOTE: Eureka used beacon for what?
+	// BeaconAPIClient *BeaconAPIClient	NOTE: Eureka used beacon for what?
 
 	Faucet *ecdsa.PrivateKey
 }
@@ -122,5 +122,4 @@ func (e Ethereum) ForgeScript(deployer *ecdsa.PrivateKey, solidityContract strin
 	stdoutBytes := stdoutBuf.Bytes()
 
 	return stdoutBytes, nil
-
 }

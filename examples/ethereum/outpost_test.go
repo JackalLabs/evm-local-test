@@ -29,7 +29,6 @@ type OutpostTestSuite struct {
 }
 
 func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
-
 	s.TestSuite.SetupSuite(ctx)
 
 	eth, canined := s.ChainA, s.ChainB
@@ -49,7 +48,6 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 
 		s.deployer, err = eth.CreateAndFundUser()
 		s.Require().NoError(err)
-
 	}))
 
 	s.Require().True(s.Run("Deploy ethereum contracts", func() {
@@ -80,7 +78,6 @@ func (s *OutpostTestSuite) SetupSuite(ctx context.Context) {
 		fmt.Println(stdout)
 		fmt.Println(err)
 		fmt.Println("****deployment complete****")
-
 	}))
 }
 
@@ -96,9 +93,7 @@ func (s *OutpostTestSuite) TestDummy() {
 	fmt.Println(canined)
 
 	s.Require().True(s.Run("dummy", func() {
-
 		fmt.Println("made it here")
 		time.Sleep(10 * time.Hour)
-
 	}))
 }

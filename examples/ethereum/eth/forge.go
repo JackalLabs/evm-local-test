@@ -13,12 +13,17 @@ func ExecuteCommand(command string, args []string) (string, error) {
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 
-	err := cmd.Start() // Start the command without waiting for it to finish
+	err := cmd.Start()
 	if err != nil {
-		return "", fmt.Errorf("failed to start command: %s", err)
+		return "", fmt.Errorf("failed to start command: %s, stderr: %s", err, stderr.String())
 	}
 
-	// Optionally, you can wait for a short time to ensure it's started correctly
-	// Or monitor its output asynchronously using goroutines
+	go func() {
+		err = cmd.Wait()
+		if err != nil {
+			fmt.Printf("Command exited with error: %s\n", err)
+		}
+	}()
+
 	return out.String(), nil
 }

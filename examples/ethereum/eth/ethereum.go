@@ -123,3 +123,39 @@ func (e Ethereum) ForgeScript(deployer *ecdsa.PrivateKey, solidityContract strin
 
 	return stdoutBytes, nil
 }
+
+func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contractPath string) ([]byte, error) {
+	// Prepare the forge create command
+	cmd := exec.Command("forge", "create",
+		fmt.Sprintf("%s:%s", contractPath, contractName), // Format as "path:ContractName"
+		"--rpc-url", e.RPC,
+		"--private-key", fmt.Sprintf("0x%s", hex.EncodeToString(deployer.D.Bytes())),
+		"-vvvv",
+	)
+
+	// Inherit the parent process environment
+	cmd.Env = os.Environ()
+
+	var stdoutBuf bytes.Buffer
+
+	// Create a MultiWriter to write to both os.Stdout and the buffer
+	multiWriter := io.MultiWriter(os.Stdout, &stdoutBuf)
+
+	// Set the command's stdout and stderr to MultiWriter
+	cmd.Stdout = multiWriter
+	cmd.Stderr = os.Stderr
+
+	// Debugging: Print the command arguments
+	fmt.Println("The args are", cmd.Args)
+
+	// Run the command
+	if err := cmd.Run(); err != nil {
+		fmt.Println("Error executing command:", cmd.Args, err)
+		return nil, err
+	}
+
+	// Get the output as byte slices
+	stdoutBytes := stdoutBuf.Bytes()
+
+	return stdoutBytes, nil
+}

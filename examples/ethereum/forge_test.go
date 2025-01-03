@@ -9,8 +9,8 @@ import (
 
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
@@ -76,20 +76,28 @@ func (s *OutpostTestSuite) TestForge() {
 		log.Fatalf("Failed to get chain ID: %v", err)
 	}
 
-	// Create a keyed transactor with the chain ID
-	auth, err := bind.NewKeyedTransactorWithChainID(privKeyA, chainID)
-	if err != nil {
-		log.Fatalf("Failed to create keyed transactor: %v", err)
-	}
-
-	// Fill in the transaction details
-	auth.Nonce = big.NewInt(int64(nonce))
-	auth.Value = new(big.Int).Mul(big.NewInt(35), big.NewInt(1e18)) // 35 ETH in wei
-	auth.GasLimit = uint64(21000)                                   // Standard gas limit for ETH transfer
-	auth.GasPrice, err = client.SuggestGasPrice(context.Background())
+	// Prepare the transaction
+	amount := new(big.Int).Mul(big.NewInt(35), big.NewInt(1e18)) // 35 ETH in wei
+	gasLimit := uint64(21000)                                    // Standard gas limit for ETH transfer
+	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to get gas price: %v", err)
 	}
+
+	tx := types.NewTransaction(nonce, addressB, amount, gasLimit, gasPrice, nil)
+
+	// Sign the transaction
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), privKeyA)
+	if err != nil {
+		log.Fatalf("Failed to sign transaction: %v", err)
+	}
+
+	// Send the transaction
+	err = client.SendTransaction(context.Background(), signedTx)
+	if err != nil {
+		log.Fatalf("Failed to send transaction: %v", err)
+	}
+	fmt.Printf("Transaction sent: %s\n", signedTx.Hash().Hex())
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "forge-std/Script.sol"; // Import Foundry's Script utilities
+
 // Simple Storage Contract
 contract SimpleStorage {
     uint256 private storedData;
@@ -16,19 +18,24 @@ contract SimpleStorage {
     }
 }
 
-// Testing Contract
-contract SimpleStorageTest {
-    SimpleStorage public simpleStorage;
+// Script for deploying and interacting with SimpleStorage
+contract SimpleStorageScript is Script {
+    function run() public {
+        // Start broadcasting transactions
+        vm.startBroadcast();
 
-    // Constructor to set up the test
-    constructor() {
-        simpleStorage = new SimpleStorage();
-    }
+        // Deploy the SimpleStorage contract
+        SimpleStorage simpleStorage = new SimpleStorage();
 
-    // Test the set and get functions
-    function testSetAndGet() public returns (bool) {
+        // Interact with the deployed contract (optional)
         simpleStorage.set(42);
-        require(simpleStorage.get() == 42, "Storage mismatch");
-        return true;
+        uint256 retrievedValue = simpleStorage.get();
+        require(retrievedValue == 42, "Storage mismatch");
+
+        // Stop broadcasting transactions
+        vm.stopBroadcast();
+
+        // Log results
+        console.log("SimpleStorage deployed and verified. Stored value:", retrievedValue);
     }
 }

@@ -131,6 +131,7 @@ func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contract
 		"--rpc-url", e.RPC,
 		"--private-key", fmt.Sprintf("0x%s", hex.EncodeToString(deployer.D.Bytes())),
 		"--broadcast",
+		"--gas-price", "20000000000",
 		"-vvvv",
 	)
 

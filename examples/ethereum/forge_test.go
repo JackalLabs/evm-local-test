@@ -68,22 +68,28 @@ func (s *OutpostTestSuite) TestForge() {
 	if err != nil {
 		log.Fatalf("Failed to get nonce for Account A: %v", err)
 	}
-	fmt.Printf("Account A's nonce is %s\n", nonce)
+	fmt.Printf("Account A's nonce is %d\n", nonce)
 
-	// Create a transaction to send 35 ETH from Account A to Account B
-	amount := new(big.Int).Mul(big.NewInt(35), big.NewInt(1e18)) // 35 ETH in wei
-	gasLimit := uint64(21000)                                    // Standard gas limit for ETH transfer
-	gasPrice, err := client.SuggestGasPrice(context.Background())
+	// Get chain ID from the client
+	chainID, err := client.NetworkID(context.Background())
+	if err != nil {
+		log.Fatalf("Failed to get chain ID: %v", err)
+	}
+
+	// Create a keyed transactor with the chain ID
+	auth, err := bind.NewKeyedTransactorWithChainID(privKeyA, chainID)
+	if err != nil {
+		log.Fatalf("Failed to create keyed transactor: %v", err)
+	}
+
+	// Fill in the transaction details
+	auth.Nonce = big.NewInt(int64(nonce))
+	auth.Value = new(big.Int).Mul(big.NewInt(35), big.NewInt(1e18)) // 35 ETH in wei
+	auth.GasLimit = uint64(21000)                                   // Standard gas limit for ETH transfer
+	auth.GasPrice, err = client.SuggestGasPrice(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to get gas price: %v", err)
 	}
-
-	tx := bind.NewKeyedTransactor(privKeyA)
-	tx.Nonce = big.NewInt(int64(nonce))
-	tx.Value = amount      // Amount in wei
-	tx.GasLimit = gasLimit // Gas limit
-	tx.GasPrice = gasPrice // Gas price
-	tx.To = &addressB      // Recipient address
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")

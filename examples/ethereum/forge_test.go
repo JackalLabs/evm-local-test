@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/big"
 	"time"
 
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -46,10 +49,41 @@ func (s *OutpostTestSuite) TestForge() {
 
 	// Define accounts and their private keys
 	privateKeyA := "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-	fmt.Println(privateKeyA)
 	// Recipient B address
 	addressB := common.HexToAddress("0x70997970C51812dc3A010C7d01b50e0d17dc79C8")
 	fmt.Println(addressB)
+
+	// Convert accountA's private key string to *ecdsa.PrivateKey
+	privKeyA, err := crypto.HexToECDSA(privateKeyA[2:]) // Remove "0x" prefix
+	if err != nil {
+		log.Fatalf("Failed to parse private key: %v", err)
+	}
+
+	// Get the public address of Account A
+	addressA := crypto.PubkeyToAddress(privKeyA.PublicKey)
+	fmt.Println(addressA)
+
+	// Check Account A's nonce
+	nonce, err := client.PendingNonceAt(context.Background(), addressA)
+	if err != nil {
+		log.Fatalf("Failed to get nonce for Account A: %v", err)
+	}
+	fmt.Printf("Account A's nonce is %s\n", nonce)
+
+	// Create a transaction to send 35 ETH from Account A to Account B
+	amount := new(big.Int).Mul(big.NewInt(35), big.NewInt(1e18)) // 35 ETH in wei
+	gasLimit := uint64(21000)                                    // Standard gas limit for ETH transfer
+	gasPrice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		log.Fatalf("Failed to get gas price: %v", err)
+	}
+
+	tx := bind.NewKeyedTransactor(privKeyA)
+	tx.Nonce = big.NewInt(int64(nonce))
+	tx.Value = amount      // Amount in wei
+	tx.GasLimit = gasLimit // Gas limit
+	tx.GasPrice = gasPrice // Gas price
+	tx.To = &addressB      // Recipient address
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")

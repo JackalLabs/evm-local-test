@@ -17,6 +17,12 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
+const (
+	SimpleStorageAddressKey = "SimpleStorageAddress"
+)
+
+var ContractAddress string
+
 func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	// Start Anvil node
 	anvilArgs := []string{"--port", "8545", "--block-time", "1"}
@@ -50,8 +56,8 @@ func (s *OutpostTestSuite) TestForge() {
 	defer client.Close()
 
 	// Let's use account (9) as the faucet
-	faucetPrivateKeyHex := "0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6" // Replace with your actual faucet private key
-	faucetPrivateKey, err := crypto.HexToECDSA(faucetPrivateKeyHex[2:])                         // Remove "0x" prefix
+	faucetPrivateKeyHex := "0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6"
+	faucetPrivateKey, err := crypto.HexToECDSA(faucetPrivateKeyHex[2:]) // Remove "0x" prefix
 	if err != nil {
 		log.Fatalf("Failed to parse faucet private key: %v", err)
 	}
@@ -62,12 +68,10 @@ func (s *OutpostTestSuite) TestForge() {
 		log.Fatalf("Failed to initialize Ethereum object: %v", err)
 	}
 
-	// Ethereum object is now populated and ready to use
 	log.Printf("Ethereum object initialized: %+v", ethWrapper)
 
 	// Define accounts and their private keys
 	privateKeyA := "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-	// Recipient B address
 	addressB := common.HexToAddress("0x70997970C51812dc3A010C7d01b50e0d17dc79C8")
 	fmt.Println(addressB)
 
@@ -96,7 +100,7 @@ func (s *OutpostTestSuite) TestForge() {
 
 	// Prepare the transaction
 	amount := new(big.Int).Mul(big.NewInt(35), big.NewInt(1e18)) // 35 ETH in wei
-	gasLimit := uint64(21000)                                    // Standard gas limit for ETH transfer
+	gasLimit := uint64(21000)
 	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to get gas price: %v", err)
@@ -117,13 +121,6 @@ func (s *OutpostTestSuite) TestForge() {
 	}
 	fmt.Printf("Transaction sent: %s\n", signedTx.Hash().Hex())
 
-	// Check Account A's nonce
-	nonce, err = client.PendingNonceAt(context.Background(), addressA)
-	if err != nil {
-		log.Fatalf("Failed to get nonce for Account A: %v", err)
-	}
-	fmt.Printf("Account A's nonce is %d\n", nonce)
-
 	// Query Account B's balance to ensure it received the 35 ETH
 	balanceB, err := client.BalanceAt(context.Background(), addressB, nil)
 	if err != nil {
@@ -135,16 +132,17 @@ func (s *OutpostTestSuite) TestForge() {
 	dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
 	pathOfScripts := filepath.Join(dir, "scripts/SimpleStorage.s.sol")
 
-	fmt.Println(pathOfScripts)
-	// AccountA will deploy simple storage
-	contractAddress, err := ethWrapper.ForgeCreate(privKeyA, "SimpleStorage", pathOfScripts)
+	// Deploy the SimpleStorage contract
+	returnedContractAddr, err := ethWrapper.ForgeCreate(privKeyA, "SimpleStorage", pathOfScripts)
 	if err != nil {
 		log.Fatalf("Failed to deploy simple storage: %v", err)
 	}
-	fmt.Printf("contract address: %s\n", contractAddress)
+
+	ContractAddress = returnedContractAddr
+	fmt.Printf("SimpleStorage deployed at: %s\n", ContractAddress)
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))
-	time.Sleep(10 * time.Hour) // Placeholder for extended testing
+	time.Sleep(10 * time.Hour)
 }

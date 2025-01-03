@@ -55,13 +55,13 @@ func (s *OutpostTestSuite) TestForge() {
 	}
 
 	// Create the Ethereum object
-	ethereum, err := eth.NewEthereum(ctx, rpcURL, faucetPrivateKey)
+	ethWrapper, err := eth.NewEthereum(ctx, rpcURL, faucetPrivateKey)
 	if err != nil {
 		log.Fatalf("Failed to initialize Ethereum object: %v", err)
 	}
 
 	// Ethereum object is now populated and ready to use
-	log.Printf("Ethereum object initialized: %+v", ethereum)
+	log.Printf("Ethereum object initialized: %+v", ethWrapper)
 
 	// Define accounts and their private keys
 	privateKeyA := "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"

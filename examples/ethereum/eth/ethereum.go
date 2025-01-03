@@ -172,3 +172,29 @@ func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contract
 	// If no address is found, return an error
 	return "", fmt.Errorf("could not find deployed contract address in output")
 }
+
+// CastSend uses the `cast send` command to call any contract function.
+func CastSend(contractAddress, functionSig string, args []string, rpcURL, privateKey string) error {
+	// Prepare the `cast send` command
+	cmdArgs := []string{"send", contractAddress, functionSig}
+	cmdArgs = append(cmdArgs, args...) // Append function arguments
+	cmdArgs = append(cmdArgs, "--rpc-url", rpcURL, "--private-key", privateKey)
+
+	cmd := exec.Command("cast", cmdArgs...)
+
+	// Capture output for debugging
+	var stdoutBuf, stderrBuf bytes.Buffer
+	cmd.Stdout = &stdoutBuf
+	cmd.Stderr = &stderrBuf
+
+	// Run the command
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Error executing cast send: %s\nStdout: %s\nStderr: %s\n", err, stdoutBuf.String(), stderrBuf.String())
+		return err
+	}
+
+	// Print successful execution
+	fmt.Printf("Successfully called `%s` on contract %s with args %v\nOutput: %s\n",
+		functionSig, contractAddress, args, stdoutBuf.String())
+	return nil
+}

@@ -99,6 +99,13 @@ func (s *OutpostTestSuite) TestForge() {
 	}
 	fmt.Printf("Transaction sent: %s\n", signedTx.Hash().Hex())
 
+	// Check Account A's nonce
+	nonce, err = client.PendingNonceAt(context.Background(), addressA)
+	if err != nil {
+		log.Fatalf("Failed to get nonce for Account A: %v", err)
+	}
+	fmt.Printf("Account A's nonce is %d\n", nonce)
+
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))

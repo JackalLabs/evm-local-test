@@ -124,7 +124,7 @@ func (e Ethereum) ForgeScript(deployer *ecdsa.PrivateKey, solidityContract strin
 	return stdoutBytes, nil
 }
 
-func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contractPath string) ([]byte, error) {
+func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contractPath string) (string, error) {
 	// Prepare the forge create command
 	cmd := exec.Command("forge", "create",
 		fmt.Sprintf("%s:%s", contractPath, contractName), // Format as "path:ContractName"
@@ -152,11 +152,22 @@ func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contract
 	// Run the command
 	if err := cmd.Run(); err != nil {
 		fmt.Println("Error executing command:", cmd.Args, err)
-		return nil, err
+		return "", err
 	}
 
-	// Get the output as byte slices
-	stdoutBytes := stdoutBuf.Bytes()
+	// Parse the output to find the deployed contract address
+	output := stdoutBuf.String()
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "Deployed to:") {
+			// Extract the address after "Deployed to:"
+			parts := strings.Fields(line)
+			if len(parts) > 2 {
+				return parts[2], nil // Return the contract address
+			}
+		}
+	}
 
-	return stdoutBytes, nil
+	// If no address is found, return an error
+	return "", fmt.Errorf("could not find deployed contract address in output")
 }

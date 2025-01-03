@@ -137,11 +137,11 @@ func (s *OutpostTestSuite) TestForge() {
 
 	fmt.Println(pathOfScripts)
 	// AccountA will deploy simple storage
-	stdout, err := ethWrapper.ForgeCreate(privKeyA, "SimpleStorage", pathOfScripts)
+	contractAddress, err := ethWrapper.ForgeCreate(privKeyA, "SimpleStorage", pathOfScripts)
 	if err != nil {
 		log.Fatalf("Failed to deploy simple storage: %v", err)
 	}
-	fmt.Println(stdout)
+	fmt.Printf("contract address: %s\n", contractAddress)
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")

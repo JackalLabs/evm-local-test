@@ -47,6 +47,22 @@ func (s *OutpostTestSuite) TestForge() {
 	}
 	defer client.Close()
 
+	// Let's use account (9) as the faucet
+	faucetPrivateKeyHex := "0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6" // Replace with your actual faucet private key
+	faucetPrivateKey, err := crypto.HexToECDSA(faucetPrivateKeyHex[2:])                         // Remove "0x" prefix
+	if err != nil {
+		log.Fatalf("Failed to parse faucet private key: %v", err)
+	}
+
+	// Create the Ethereum object
+	ethereum, err := eth.NewEthereum(ctx, rpcURL, faucetPrivateKey)
+	if err != nil {
+		log.Fatalf("Failed to initialize Ethereum object: %v", err)
+	}
+
+	// Ethereum object is now populated and ready to use
+	log.Printf("Ethereum object initialized: %+v", ethereum)
+
 	// Define accounts and their private keys
 	privateKeyA := "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 	// Recipient B address
@@ -113,6 +129,8 @@ func (s *OutpostTestSuite) TestForge() {
 	}
 
 	fmt.Printf("Account B balance: %s ETH\n", new(big.Float).Quo(new(big.Float).SetInt(balanceB), big.NewFloat(1e18)).String())
+
+	// stdout, err := ForgeScript(s.deployer, pathOfScripts)
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")

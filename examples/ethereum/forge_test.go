@@ -133,11 +133,11 @@ func (s *OutpostTestSuite) TestForge() {
 	fmt.Printf("Account B balance: %s ETH\n", new(big.Float).Quo(new(big.Float).SetInt(balanceB), big.NewFloat(1e18)).String())
 
 	dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
-	pathOfScripts := filepath.Join(dir, "/scripts/SimpleStorage.s.sol:SimpleStorage")
+	pathOfScripts := filepath.Join(dir, "scripts/SimpleStorage.s.sol")
 
 	fmt.Println(pathOfScripts)
 	// AccountA will deploy simple storage
-	stdout, err := ethWrapper.ForgeScript(privKeyA, pathOfScripts)
+	stdout, err := ethWrapper.ForgeCreate(privKeyA, "SimpleStorage", pathOfScripts)
 	if err != nil {
 		log.Fatalf("Failed to deploy simple storage: %v", err)
 	}

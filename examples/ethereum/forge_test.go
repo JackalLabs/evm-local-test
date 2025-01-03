@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
@@ -130,7 +132,16 @@ func (s *OutpostTestSuite) TestForge() {
 
 	fmt.Printf("Account B balance: %s ETH\n", new(big.Float).Quo(new(big.Float).SetInt(balanceB), big.NewFloat(1e18)).String())
 
-	// stdout, err := ForgeScript(s.deployer, pathOfScripts)
+	dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
+	pathOfScripts := filepath.Join(dir, "/scripts/SimpleStorage.s.sol:SimpleStorage")
+
+	fmt.Println(pathOfScripts)
+	// AccountA will deploy simple storage
+	stdout, err := ethWrapper.ForgeScript(privKeyA, pathOfScripts)
+	if err != nil {
+		log.Fatalf("Failed to deploy simple storage: %v", err)
+	}
+	fmt.Println(stdout)
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")

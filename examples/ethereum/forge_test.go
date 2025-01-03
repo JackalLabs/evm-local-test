@@ -106,6 +106,14 @@ func (s *OutpostTestSuite) TestForge() {
 	}
 	fmt.Printf("Account A's nonce is %d\n", nonce)
 
+	// Query Account B's balance to ensure it received the 35 ETH
+	balanceB, err := client.BalanceAt(context.Background(), addressB, nil)
+	if err != nil {
+		log.Fatalf("Failed to query balance for Account B: %v", err)
+	}
+
+	fmt.Printf("Account B balance: %s ETH\n", new(big.Float).Quo(new(big.Float).SetInt(balanceB), big.NewFloat(1e18)).String())
+
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))

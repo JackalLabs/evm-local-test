@@ -200,6 +200,7 @@ func CastSend(contractAddress, functionSig string, args []string, rpcURL, privat
 }
 
 // CastCall uses `cast call` to interact with a view function of any Ethereum contract.
+// It decodes the output into a human-readable format for standard return types.
 func CastCall(contractAddress, functionSig string, rpcURL string, args []string) (string, error) {
 	// Prepare the `cast call` command
 	cmdArgs := []string{"call", contractAddress, functionSig}
@@ -219,8 +220,34 @@ func CastCall(contractAddress, functionSig string, rpcURL string, args []string)
 		return "", err
 	}
 
-	// Process and return the output
-	output := strings.TrimSpace(stdoutBuf.String())
-	fmt.Printf("Successfully called `%s` on contract %s\nOutput: %s\n", functionSig, contractAddress, output)
-	return output, nil
+	// Process the raw output
+	rawOutput := strings.TrimSpace(stdoutBuf.String())
+
+	// Decode the output
+	decodedValue, err := decodeHexOutput(rawOutput)
+	if err != nil {
+		fmt.Printf("Error decoding output: %v\n", err)
+		return rawOutput, nil // Return raw output as fallback
+	}
+
+	fmt.Printf("Successfully called `%s` on contract %s\nDecoded Output: %s\n", functionSig, contractAddress, decodedValue)
+	return decodedValue, nil
+}
+
+// decodeHexOutput decodes an ABI-encoded hex string into a human-readable number (for uint256 results).
+func decodeHexOutput(hexOutput string) (string, error) {
+	// Remove "0x" prefix if present
+	if strings.HasPrefix(hexOutput, "0x") {
+		hexOutput = hexOutput[2:]
+	}
+
+	// Decode the hex string into bytes
+	bytes, err := hex.DecodeString(hexOutput)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode hex string: %w", err)
+	}
+
+	// Convert the bytes to a big.Int
+	result := new(big.Int).SetBytes(bytes)
+	return result.String(), nil
 }

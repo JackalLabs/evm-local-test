@@ -143,7 +143,7 @@ func (s *OutpostTestSuite) TestForge() {
 
 	// Call the `set` function on SimpleStorage using CastSend
 	functionSig := "set(uint256)"
-	args := []string{"42"} // Set the stored value to 42
+	args := []string{"60"} // Set the stored value to 42
 	err = eth.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA)
 	if err != nil {
 		log.Fatalf("Failed to call `set` on the contract: %v", err)

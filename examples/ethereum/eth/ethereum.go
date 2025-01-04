@@ -198,3 +198,29 @@ func CastSend(contractAddress, functionSig string, args []string, rpcURL, privat
 		functionSig, contractAddress, args, stdoutBuf.String())
 	return nil
 }
+
+// CastCall uses `cast call` to interact with a view function of any Ethereum contract.
+func CastCall(contractAddress, functionSig string, rpcURL string, args []string) (string, error) {
+	// Prepare the `cast call` command
+	cmdArgs := []string{"call", contractAddress, functionSig}
+	cmdArgs = append(cmdArgs, args...) // Append function arguments if needed
+	cmdArgs = append(cmdArgs, "--rpc-url", rpcURL)
+
+	cmd := exec.Command("cast", cmdArgs...)
+
+	// Capture output for debugging
+	var stdoutBuf, stderrBuf bytes.Buffer
+	cmd.Stdout = &stdoutBuf
+	cmd.Stderr = &stderrBuf
+
+	// Run the command
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Error executing cast call: %s\nStdout: %s\nStderr: %s\n", err, stdoutBuf.String(), stderrBuf.String())
+		return "", err
+	}
+
+	// Process and return the output
+	output := strings.TrimSpace(stdoutBuf.String())
+	fmt.Printf("Successfully called `%s` on contract %s\nOutput: %s\n", functionSig, contractAddress, output)
+	return output, nil
+}

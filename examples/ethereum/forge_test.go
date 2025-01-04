@@ -141,6 +141,16 @@ func (s *OutpostTestSuite) TestForge() {
 	ContractAddress = returnedContractAddr
 	fmt.Printf("SimpleStorage deployed at: %s\n", ContractAddress)
 
+	// Call the `set` function on SimpleStorage using CastSend
+	functionSig := "set(uint256)"
+	args := []string{"42"} // Set the stored value to 42
+	err = eth.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA)
+	if err != nil {
+		log.Fatalf("Failed to call `set` on the contract: %v", err)
+	}
+
+	fmt.Println("Successfully tested the `set` function")
+
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))

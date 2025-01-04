@@ -151,6 +151,15 @@ func (s *OutpostTestSuite) TestForge() {
 
 	fmt.Println("Successfully tested the `set` function")
 
+	// Call the `get` function using CastCall
+	functionSig = "get()" // Getter function
+	output, err := eth.CastCall(ContractAddress, functionSig, rpcURL, nil)
+	if err != nil {
+		log.Fatalf("Failed to call `get` on the contract: %v", err)
+	}
+
+	fmt.Printf("Value retrieved from `get`: %s\n", output)
+
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))

@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
@@ -129,11 +127,13 @@ func (s *OutpostTestSuite) TestForge() {
 
 	fmt.Printf("Account B balance: %s ETH\n", new(big.Float).Quo(new(big.Float).SetInt(balanceB), big.NewFloat(1e18)).String())
 
-	dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
-	pathOfScripts := filepath.Join(dir, "scripts/SimpleStorage.s.sol")
+	// dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
+	// pathOfScripts := filepath.Join(dir, "scripts/SimpleStorage.s.sol")
+
+	pathOfOutpost := "/home/bi/jackal/ict-evm/forge/src/JackalV1.sol" // NOTE: make compatible for everyone
 
 	// Deploy the SimpleStorage contract
-	returnedContractAddr, err := ethWrapper.ForgeCreate(privKeyA, "SimpleStorage", pathOfScripts)
+	returnedContractAddr, err := ethWrapper.ForgeCreate(privKeyA, "JackalBridge", pathOfOutpost)
 	if err != nil {
 		log.Fatalf("Failed to deploy simple storage: %v", err)
 	}

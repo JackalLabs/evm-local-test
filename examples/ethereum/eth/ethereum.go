@@ -131,10 +131,24 @@ func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contract
 		"--rpc-url", e.RPC,
 		"--private-key", fmt.Sprintf("0x%s", hex.EncodeToString(deployer.D.Bytes())),
 		"--broadcast",
-		"--remappings", "/home/bi/jackal/ict-evm/forge/remappings.txt", // NOTE: make compatible for all
+		"--remappings", "@openzeppelin/contracts-upgradeable/=forge/lib/openzeppelin-contracts-upgradeable/contracts/",
+		"--remappings", "@openzeppelin/contracts/=forge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/",
+		"--remappings", "@chainlink/interfaces/=forge/lib/foundry-chainlink-toolkit/src/interfaces/",
 		"--gas-price", "20000000000",
 		"-vvvv",
 	)
+
+	/*
+		Note: When forge create is run from this file, it will resolve all dependencies
+		with 'ict-evm' as the root directory. We give the paths of the dependencies relative
+		to this root, and the forge command works.
+	*/
+
+	/*
+		@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
+		@openzeppelin/contracts/=lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/
+		@chainlink/interfaces/=lib/foundry-chainlink-toolkit/src/interfaces/
+	*/
 
 	// Inherit the parent process environment
 	cmd.Env = os.Environ()

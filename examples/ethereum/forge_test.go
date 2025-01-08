@@ -92,6 +92,7 @@ func (s *OutpostTestSuite) TestForge() {
 
 	// Get chain ID from the client
 	chainID, err := client.NetworkID(context.Background())
+	fmt.Printf("Chain ID is: %d\n", chainID)
 	if err != nil {
 		log.Fatalf("Failed to get chain ID: %v", err)
 	}
@@ -137,7 +138,12 @@ func (s *OutpostTestSuite) TestForge() {
 	}
 	priceFeed := "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
 
+	// WARNING: remember to add the price feed back into the contract
+	// note: how on earth is the command still consuming 'priceFeed' when I removed it from the contract's
+	// constructor?
+
 	// Deploy the JackalBridge contract
+	// The deployer is the owner of the contract, and who is allowed to relay the event--I think?
 	returnedContractAddr, err := ethWrapper.ForgeCreate(privKeyA, "JackalBridge", pathOfOutpost, relays, priceFeed)
 	if err != nil {
 		log.Fatalf("Failed to deploy simple storage: %v", err)

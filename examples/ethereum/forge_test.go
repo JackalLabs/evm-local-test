@@ -132,8 +132,14 @@ func (s *OutpostTestSuite) TestForge() {
 
 	pathOfOutpost := "/home/bi/jackal/ict-evm/forge/src/JackalV1.sol" // NOTE: make compatible for everyone
 
+	relays := []string{
+		"0x1234567890abcdef1234567890abcdef12345678",
+		"0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+	}
+	priceFeed := "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+
 	// Deploy the SimpleStorage contract
-	returnedContractAddr, err := ethWrapper.ForgeCreate(privKeyA, "JackalBridge", pathOfOutpost)
+	returnedContractAddr, err := ethWrapper.ForgeCreate(privKeyA, "JackalBridge", pathOfOutpost, relays, priceFeed)
 	if err != nil {
 		log.Fatalf("Failed to deploy simple storage: %v", err)
 	}

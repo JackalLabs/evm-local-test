@@ -124,9 +124,12 @@ func (e Ethereum) ForgeScript(deployer *ecdsa.PrivateKey, solidityContract strin
 	return stdoutBytes, nil
 }
 
-func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contractPath string) (string, error) {
+func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contractPath string, relays []string, priceFeed string) (string, error) {
 	// Prepare the forge create command
-	cmd := exec.Command("forge", "create",
+	relaysArg := fmt.Sprintf("[%s]", strings.Join(relays, ",")) // Format array as [address1,address2,...]
+
+	cmdArgs := []string{
+		"create",
 		fmt.Sprintf("%s:%s", contractPath, contractName), // Format as "path:ContractName"
 		"--rpc-url", e.RPC,
 		"--private-key", fmt.Sprintf("0x%s", hex.EncodeToString(deployer.D.Bytes())),
@@ -136,19 +139,10 @@ func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contract
 		"--remappings", "@chainlink/interfaces/=forge/lib/foundry-chainlink-toolkit/src/interfaces/",
 		"--gas-price", "20000000000",
 		"-vvvv",
-	)
+		"--constructor-args", relaysArg, priceFeed,
+	}
 
-	/*
-		Note: When forge create is run from this file, it will resolve all dependencies
-		with 'ict-evm' as the root directory. We give the paths of the dependencies relative
-		to this root, and the forge command works.
-	*/
-
-	/*
-		@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
-		@openzeppelin/contracts/=lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/
-		@chainlink/interfaces/=lib/foundry-chainlink-toolkit/src/interfaces/
-	*/
+	cmd := exec.Command("forge", cmdArgs...)
 
 	// Inherit the parent process environment
 	cmd.Env = os.Environ()

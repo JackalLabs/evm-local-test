@@ -137,33 +137,21 @@ func (s *OutpostTestSuite) TestForge() {
 	}
 	priceFeed := "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
 
-	// Deploy the SimpleStorage contract
+	// Deploy the JackalBridge contract
 	returnedContractAddr, err := ethWrapper.ForgeCreate(privKeyA, "JackalBridge", pathOfOutpost, relays, priceFeed)
 	if err != nil {
 		log.Fatalf("Failed to deploy simple storage: %v", err)
 	}
 
 	ContractAddress = returnedContractAddr
-	fmt.Printf("SimpleStorage deployed at: %s\n", ContractAddress)
+	fmt.Printf("JackalBridge deployed at: %s\n", ContractAddress)
 
-	// Call the `set` function on SimpleStorage using CastSend
-	functionSig := "set(uint256)"
-	args := []string{"60"} // Set the stored value to 42
-	err = eth.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA)
-	if err != nil {
-		log.Fatalf("Failed to call `set` on the contract: %v", err)
-	}
-
-	fmt.Println("Successfully tested the `set` function")
-
-	// Call the `get` function using CastCall
-	functionSig = "get()" // Getter function
-	output, err := eth.CastCall(ContractAddress, functionSig, rpcURL, nil)
-	if err != nil {
-		log.Fatalf("Failed to call `get` on the contract: %v", err)
-	}
-
-	fmt.Printf("Value retrieved from `get`: %s\n", output)
+	// // Call the `get` function using CastCall
+	// functionSig = "get()" // Getter function
+	// output, err := eth.CastCall(ContractAddress, functionSig, rpcURL, nil)
+	// if err != nil {
+	// 	log.Fatalf("Failed to call `get` on the contract: %v", err)
+	// }
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")

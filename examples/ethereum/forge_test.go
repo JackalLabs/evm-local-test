@@ -133,8 +133,7 @@ func (s *OutpostTestSuite) TestForge() {
 	pathOfOutpost := "/home/bi/jackal/ict-evm/forge/src/JackalV1.sol" // NOTE: make compatible for everyone
 
 	relays := []string{
-		"0x1234567890abcdef1234567890abcdef12345678",
-		"0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+		"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
 	}
 	priceFeed := "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"
 

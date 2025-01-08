@@ -11,7 +11,7 @@ contract JackalBridge is Ownable, Jackal {
 
     address[] public relays;
 
-    constructor(address[] memory _relays, address _priceFeed) Ownable(msg.sender){
+    constructor(address[] memory _relays) Ownable(msg.sender){
         require(_relays.length > 0, "must provide relays");
 
         relays = _relays;

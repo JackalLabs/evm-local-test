@@ -186,17 +186,22 @@ func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contract
 	return "", fmt.Errorf("could not find deployed contract address in output")
 }
 
-// CastSend uses the `cast send` command to call any contract function with ETH value.
-func (e Ethereum) CastSend(contractAddress, functionSig string, args []string, rpcURL, privateKey string, value *big.Int) error {
+func (e Ethereum) CastSend(contractAddress, functionSig string, args []string, rpcURL, privateKey string, value *big.Int) (string, error) {
 	// Prepare the `cast send` command
 	cmdArgs := []string{"send", contractAddress, functionSig}
 	cmdArgs = append(cmdArgs, args...) // Append function arguments
 	cmdArgs = append(cmdArgs, "--rpc-url", rpcURL, "--private-key", privateKey)
 	if value != nil {
-		cmdArgs = append(cmdArgs, "--value", value.String()) // Append ETH value if provided
+		cmdArgs = append(cmdArgs, "--value", value.String())
 	}
+	cmdArgs = append(cmdArgs, "--gas-price", "2000000000000000")
+	cmdArgs = append(cmdArgs, "--gas-limit", "1000000")
+	cmdArgs = append(cmdArgs, "-vvvv")
 
 	cmd := exec.Command("cast", cmdArgs...)
+
+	// Log the full command being executed
+	fmt.Printf("Executing command: cast %s\n", strings.Join(cmdArgs, " "))
 
 	// Capture output for debugging
 	var stdoutBuf, stderrBuf bytes.Buffer
@@ -204,15 +209,31 @@ func (e Ethereum) CastSend(contractAddress, functionSig string, args []string, r
 	cmd.Stderr = &stderrBuf
 
 	// Run the command
-	if err := cmd.Run(); err != nil {
-		fmt.Printf("Error executing cast send: %s\nStdout: %s\nStderr: %s\n", err, stdoutBuf.String(), stderrBuf.String())
-		return err
+	err := cmd.Run()
+
+	// Extract the transaction hash if present
+	output := stdoutBuf.String()
+	var txHash string
+	for _, line := range strings.Split(output, "\n") {
+		if strings.HasPrefix(line, "Transaction hash:") {
+			txHash = strings.TrimSpace(strings.Split(line, ":")[1])
+			break
+		}
+	}
+
+	// Print the transaction hash
+	fmt.Printf("Transaction hash: %s\n", txHash)
+
+	// Check for errors
+	if err != nil {
+		fmt.Printf("Error executing cast send: %s\nStdout: %s\nStderr: %s\n", err, output, stderrBuf.String())
+		return txHash, err
 	}
 
 	// Print successful execution
 	fmt.Printf("Successfully called `%s` on contract %s with args %v\nOutput: %s\n",
-		functionSig, contractAddress, args, stdoutBuf.String())
-	return nil
+		functionSig, contractAddress, args, output)
+	return txHash, nil
 }
 
 // CastCall uses `cast call` to interact with a view function of any Ethereum contract.
@@ -269,24 +290,40 @@ func decodeHexOutput(hexOutput string) (string, error) {
 }
 
 func ListenToLogs(client *ethclient.Client, contractAddress common.Address) {
+	// Compute the signature hash of the `Debug` event
+	eventSignature := []byte("Debug(string)")
+	eventSignatureHash := crypto.Keccak256Hash(eventSignature)
+
+	// Set up the filter query
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{contractAddress},
+		Topics: [][]common.Hash{
+			{eventSignatureHash}, // Match only `Debug` events
+		},
 	}
 
+	// Create a channel for logs
 	logs := make(chan types.Log)
 	sub, err := client.SubscribeFilterLogs(context.Background(), query, logs)
 	if err != nil {
 		log.Fatalf("Failed to subscribe to logs: %v", err)
 	}
 
-	fmt.Println("Listening for events...")
+	fmt.Println("Listening for Debug events...")
 
+	// Process logs
 	for {
 		select {
 		case err := <-sub.Err():
-			log.Fatalf("Error: %v", err)
+			log.Fatalf("Subscription error: %v", err)
 		case vLog := <-logs:
-			fmt.Printf("Log: %+v\n", vLog)
+			// Decode the `Debug` event
+			if len(vLog.Data) > 0 {
+				message := string(vLog.Data)
+				fmt.Printf("Debug Event - Message: %s\n", message)
+			} else {
+				fmt.Printf("Received Debug Event - Raw Log: %+v\n", vLog)
+			}
 		}
 	}
 }

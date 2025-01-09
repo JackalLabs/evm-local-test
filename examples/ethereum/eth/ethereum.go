@@ -7,13 +7,17 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"log"
 	"math/big"
 	"os"
 	"os/exec"
 	"strings"
 
 	"cosmossdk.io/math"
+	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/common"
 	ethcommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/testvalues"
@@ -262,4 +266,27 @@ func decodeHexOutput(hexOutput string) (string, error) {
 	// Convert the bytes to a big.Int
 	result := new(big.Int).SetBytes(bytes)
 	return result.String(), nil
+}
+
+func ListenToLogs(client *ethclient.Client, contractAddress common.Address) {
+	query := ethereum.FilterQuery{
+		Addresses: []common.Address{contractAddress},
+	}
+
+	logs := make(chan types.Log)
+	sub, err := client.SubscribeFilterLogs(context.Background(), query, logs)
+	if err != nil {
+		log.Fatalf("Failed to subscribe to logs: %v", err)
+	}
+
+	fmt.Println("Listening for events...")
+
+	for {
+		select {
+		case err := <-sub.Err():
+			log.Fatalf("Error: %v", err)
+		case vLog := <-logs:
+			fmt.Printf("Log: %+v\n", vLog)
+		}
+	}
 }

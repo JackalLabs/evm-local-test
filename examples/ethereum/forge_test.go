@@ -152,6 +152,8 @@ func (s *OutpostTestSuite) TestForge() {
 	ContractAddress = returnedContractAddr
 	fmt.Printf("JackalBridge deployed at: %s\n", ContractAddress)
 
+	go eth.ListenToLogs(client, common.HexToAddress(ContractAddress))
+
 	// Define the parameters for the `postFile` function
 	merkle := "placeholder-merkle-root"
 	filesize := "1048576" // 1 MB in bytes (as string)

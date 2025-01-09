@@ -152,7 +152,17 @@ func (s *OutpostTestSuite) TestForge() {
 	ContractAddress = returnedContractAddr
 	fmt.Printf("JackalBridge deployed at: %s\n", ContractAddress)
 
-	go eth.ListenToLogs(client, common.HexToAddress(ContractAddress))
+	// Note: I wonder if this is Mulberry's issue: trying to use an RPC client
+	// To establish the WS connection?
+	// Connect to Anvil WS
+	wsURL := "ws://127.0.0.1:8545"
+	wsClient, err := ethclient.Dial(wsURL)
+	if err != nil {
+		log.Fatalf("Failed to connect to the Ethereum ws client: %v", err)
+	}
+	defer client.Close()
+
+	go eth.ListenToLogs(wsClient, common.HexToAddress(ContractAddress))
 
 	// Define the parameters for the `postFile` function
 	merkle := "placeholder-merkle-root"

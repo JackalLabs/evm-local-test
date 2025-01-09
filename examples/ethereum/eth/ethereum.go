@@ -183,7 +183,7 @@ func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contract
 }
 
 // CastSend uses the `cast send` command to call any contract function with ETH value.
-func CastSend(contractAddress, functionSig string, args []string, rpcURL, privateKey string, value *big.Int) error {
+func (e Ethereum) CastSend(contractAddress, functionSig string, args []string, rpcURL, privateKey string, value *big.Int) error {
 	// Prepare the `cast send` command
 	cmdArgs := []string{"send", contractAddress, functionSig}
 	cmdArgs = append(cmdArgs, args...) // Append function arguments

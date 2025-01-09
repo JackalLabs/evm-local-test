@@ -152,12 +152,21 @@ func (s *OutpostTestSuite) TestForge() {
 	ContractAddress = returnedContractAddr
 	fmt.Printf("JackalBridge deployed at: %s\n", ContractAddress)
 
-	// // Call the `get` function using CastCall
-	// functionSig = "get()" // Getter function
-	// output, err := eth.CastCall(ContractAddress, functionSig, rpcURL, nil)
-	// if err != nil {
-	// 	log.Fatalf("Failed to call `get` on the contract: %v", err)
-	// }
+	// Define the parameters for the `postFile` function
+	merkle := "placeholder-merkle-root"
+	filesize := "1048576" // 1 MB in bytes (as string)
+
+	// Get the storage price (in wei) for the given file size
+	storagePrice := big.NewInt(500000000000000000)
+
+	// Call `postFile` on the deployed JackalBridge contract
+	functionSig := "postFile(string,uint64)"
+	args := []string{merkle, filesize}
+
+	err = ethWrapper.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA, storagePrice)
+	if err != nil {
+		log.Fatalf("Failed to call `postFile` on the contract: %v", err)
+	}
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")

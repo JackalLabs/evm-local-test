@@ -168,14 +168,15 @@ func (s *OutpostTestSuite) TestForge() {
 	merkle := "placeholder-merkle-root"
 	filesize := "1048576" // 1 MB in bytes (as string)
 
-	// Get the storage price (in wei) for the given file size
-	storagePrice := big.NewInt(500000000000000000)
+	// Given value
+	value := big.NewInt(5000000000000)
 
 	// Call `postFile` on the deployed JackalBridge contract
 	functionSig := "postFile(string,uint64)"
 	args := []string{merkle, filesize}
 
-	err = ethWrapper.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA, storagePrice)
+	txHash, err := ethWrapper.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA, value)
+	fmt.Printf("tx hash is: %s\n", txHash)
 	if err != nil {
 		log.Fatalf("Failed to call `postFile` on the contract: %v", err)
 	}

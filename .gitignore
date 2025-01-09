@@ -5,3 +5,4 @@ interchaintest.test
 /bin
 vendor
 forge/out/
+forge/cache/

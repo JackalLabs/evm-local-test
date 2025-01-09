@@ -5,6 +5,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 abstract contract Jackal {
     event PostedFile(address sender, string merkle, uint64 size);
+    event Debug(string message); // Debug event
 
     function getPrice() public view virtual returns(int);
 
@@ -57,10 +58,14 @@ abstract contract Jackal {
 
         require(msg.value >= pE, string.concat("Incorrect payment amount, need ", Strings.toString(pE), " wei"));
 
+        emit Debug("into postFileFrom"); 
+
         emit PostedFile(from, merkle, filesize);
     }
 
     function postFile(string memory merkle, uint64 filesize) public payable{
+        emit Debug("into postFile"); 
+
         postFileFrom(msg.sender, merkle, filesize);
     }
 }

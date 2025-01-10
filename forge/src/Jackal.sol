@@ -54,10 +54,6 @@ abstract contract Jackal {
         require(msg.sender != address(0), "Invalid sender address");
         require(getAllowance(msg.sender, from), "No allowance for this contract set");
 
-        uint256 pE = getStoragePrice(filesize);
-
-        require(msg.value >= pE, string.concat("Incorrect payment amount, need ", Strings.toString(pE), " wei"));
-
         emit Debug("into postFileFrom"); 
 
         emit PostedFile(from, merkle, filesize);

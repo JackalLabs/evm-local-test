@@ -95,7 +95,7 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	// Set up Mulberry
 
 	// using local image for now
-	image := "biphan4/mulberry:0.0.8"
+	image := "biphan4/mulberry:0.0.9"
 	if err := PullMulberryImage(image); err != nil {
 		log.Fatalf("Error pulling Docker image: %v", err)
 	}

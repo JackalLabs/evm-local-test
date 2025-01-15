@@ -193,7 +193,7 @@ func (e Ethereum) CastSend(contractAddress, functionSig string, args []string, r
 	}
 	cmdArgs = append(cmdArgs, "--gas-price", "2000000000000000")
 	cmdArgs = append(cmdArgs, "--gas-limit", "1000000")
-	cmdArgs = append(cmdArgs, "-vvvv")
+	cmdArgs = append(cmdArgs, "--vvvv")
 
 	cmd := exec.Command("cast", cmdArgs...)
 

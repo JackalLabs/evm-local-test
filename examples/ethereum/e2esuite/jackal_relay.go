@@ -138,7 +138,7 @@ func StreamContainerLogs(containerID string) error {
 	return err
 }
 
-func updateMulberryConfigRPC(configPath, networkName, newRPC string) error {
+func updateMulberryConfigRPC(configPath, networkName, newRPC string, newWS string) error {
 	// Open the YAML file
 	file, err := os.Open(configPath)
 	if err != nil {
@@ -157,6 +157,7 @@ func updateMulberryConfigRPC(configPath, networkName, newRPC string) error {
 	for i, network := range config.NetworksConfig {
 		if network.Name == networkName {
 			config.NetworksConfig[i].RPC = newRPC
+			config.NetworksConfig[i].WS = newWS
 			break
 		}
 	}

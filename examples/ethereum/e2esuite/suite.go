@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"path/filepath"
+	"time"
 
 	dockerclient "github.com/docker/docker/client"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -134,7 +135,8 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 
 	// Update the YAML file
 	rpcAddress := "http://127.0.0.1:8545"
-	if err := updateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress); err != nil {
+	wsAddress := "ws://127.0.0.1:8545"
+	if err := updateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
 		log.Fatalf("Failed to update mulberry config: %v", err)
 	}
 
@@ -150,4 +152,5 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	}
 
 	// NOTE: it connected to RPC fine but looks like local anvil web socket is not exposed
+	time.Sleep(10 * time.Hour)
 }

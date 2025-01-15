@@ -10,6 +10,7 @@ type MulberryConfig struct {
 	NetworksConfig []struct {
 		Name     string `yaml:"name"`
 		RPC      string `yaml:"rpc"`
+		WS       string `yaml:"ws"`
 		Contract string `yaml:"contract"`
 		ChainID  int    `yaml:"chain_id"`
 		Finality int    `yaml:"finality"`

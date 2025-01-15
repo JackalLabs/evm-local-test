@@ -7,3 +7,4 @@ vendor
 forge/out/
 forge/cache/
 out/
+examples/ethereum/logs/test.log

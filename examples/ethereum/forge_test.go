@@ -131,7 +131,7 @@ func (s *OutpostTestSuite) TestForge() {
 	// dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
 	// pathOfScripts := filepath.Join(dir, "scripts/SimpleStorage.s.sol")
 
-	pathOfOutpost := "/home/bi/jackal/ict-evm/forge/src/JackalV1.sol" // NOTE: make compatible for everyone
+	pathOfOutpost := "/Users/biphan/jackal/ict-evm/forge/src/JackalV1.sol" // NOTE: make compatible for everyone
 
 	relays := []string{
 		"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",

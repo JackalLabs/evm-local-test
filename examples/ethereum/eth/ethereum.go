@@ -127,7 +127,6 @@ func (e Ethereum) ForgeScript(deployer *ecdsa.PrivateKey, solidityContract strin
 
 	return stdoutBytes, nil
 }
-
 func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contractPath string, relays []string, priceFeed string) (string, error) {
 	// Prepare the forge create command
 	relaysArg := fmt.Sprintf("[%s]", strings.Join(relays, ",")) // Format array as [address1,address2,...]
@@ -137,12 +136,10 @@ func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contract
 		fmt.Sprintf("%s:%s", contractPath, contractName), // Format as "path:ContractName"
 		"--rpc-url", e.RPC,
 		"--private-key", fmt.Sprintf("0x%s", hex.EncodeToString(deployer.D.Bytes())),
-		"--broadcast",
 		"--remappings", "@openzeppelin/contracts-upgradeable/=forge/lib/openzeppelin-contracts-upgradeable/contracts/",
 		"--remappings", "@openzeppelin/contracts/=forge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/",
 		"--remappings", "@chainlink/interfaces/=forge/lib/foundry-chainlink-toolkit/src/interfaces/",
 		"--gas-price", "20000000000",
-		"-vvvv",
 		"--constructor-args", relaysArg, priceFeed,
 	}
 

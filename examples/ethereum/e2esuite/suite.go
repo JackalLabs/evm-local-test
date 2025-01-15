@@ -94,7 +94,7 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	// Set up Mulberry
 
 	// using local image for now
-	image := "biphan4/mulberry:0.0.7"
+	image := "biphan4/mulberry:0.0.8"
 	if err := PullMulberryImage(image); err != nil {
 		log.Fatalf("Error pulling Docker image: %v", err)
 	}
@@ -133,7 +133,7 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	// logger.LogInfo("host rpc address: %s\n", anvil.GetHostRPCAddress())
 
 	// Update the YAML file
-	rpcAddress := "ws://127.0.0.1:8545"
+	rpcAddress := "http://127.0.0.1:8545"
 	if err := updateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress); err != nil {
 		log.Fatalf("Failed to update mulberry config: %v", err)
 	}

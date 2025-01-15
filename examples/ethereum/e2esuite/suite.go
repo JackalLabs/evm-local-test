@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	dockerclient "github.com/docker/docker/client"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
@@ -18,6 +19,9 @@ import (
 	chainconfig "github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/chainconfig"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
 	logger "github.com/strangelove-ventures/interchaintest/v7/examples/logger"
+
+	ethcommon "github.com/ethereum/go-ethereum/common"
+	ictethereum "github.com/strangelove-ventures/interchaintest/v7/chain/ethereum"
 )
 
 // Is this a new one or the one that already exists in eigenlayer-deployed-anvil-state.json
@@ -69,23 +73,23 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 
 	// Disabling both chains for now
 	// TODO: Run this in a goroutine and wait for it to be ready
-	// s.Require().NoError(ic.Build(ctx, s.ExecRep, interchaintest.InterchainBuildOptions{
-	// 	TestName:         s.T().Name(),
-	// 	Client:           s.dockerClient,
-	// 	NetworkID:        s.network,
-	// 	SkipPathCreation: true,
-	// }))
+	s.Require().NoError(ic.Build(ctx, s.ExecRep, interchaintest.InterchainBuildOptions{
+		TestName:         s.T().Name(),
+		Client:           s.dockerClient,
+		NetworkID:        s.network,
+		SkipPathCreation: true,
+	}))
 
 	// NOTE: We can map all query request types to their gRPC method paths for cosmos chains?
 	// Easier/faster than making function(s) for jackal queries?
 
-	// anvil := chains[0].(*ictethereum.EthereumChain)
+	anvil := chains[0].(*ictethereum.EthereumChain)
 
-	// faucet, err := crypto.ToECDSA(ethcommon.FromHex(anvilFaucetPrivateKey))
-	// s.Require().NoError(err)
+	faucet, err := crypto.ToECDSA(ethcommon.FromHex(anvilFaucetPrivateKey))
+	s.Require().NoError(err)
 
-	// s.ChainA, err = eth.NewEthereum(ctx, anvil.GetHostRPCAddress(), faucet)
-	// s.Require().NoError(err)
+	s.ChainA, err = eth.NewEthereum(ctx, anvil.GetHostRPCAddress(), faucet)
+	s.Require().NoError(err)
 
 	// Set up Mulberry
 
@@ -119,7 +123,7 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 		log.Fatalf("Error creating wallet address in container: %v", err)
 	}
 
-	// NOTE: I'm paranoid and not 100% convinced these commands are executing inside the containe, once the contract actually start emitting events
+	// NOTE: I'm paranoid and not 100% convinced these commands are executing inside the container, once the contract actually start emitting events
 	// We will see whether the relayer can pick it up
 
 	// Need an elegant way to modify mulberry's config to point to the anvil and canine-chain end points after they're spun up

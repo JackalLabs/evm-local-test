@@ -90,6 +90,9 @@ func (s *OutpostTestSuite) TestForge() {
 	}
 	fmt.Printf("Account A's nonce is %d\n", nonce)
 
+	// Bump the nounce
+	nonce = nonce + 1
+
 	// Get chain ID from the client
 	chainID, err := client.NetworkID(context.Background())
 	fmt.Printf("Chain ID is: %d\n", chainID)

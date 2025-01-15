@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
@@ -24,6 +26,8 @@ var ContractAddress string
 func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	// Start Anvil node
 	anvilArgs := []string{"--port", "8545", "--block-time", "1"}
+	// easiest way to install anvil is foundryup --install stable
+	// you can modify the code to use docker container with --network host
 	output, err := eth.ExecuteCommand("anvil", anvilArgs)
 	if err != nil {
 		fmt.Printf("Error starting Anvil: %s\n", err)
@@ -39,6 +43,8 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 		return
 	}
 	fmt.Println("Anvil is ready at", rpcURL)
+
+	// setup Mulberry as well
 }
 
 func (s *OutpostTestSuite) TestForge() {
@@ -131,10 +137,9 @@ func (s *OutpostTestSuite) TestForge() {
 
 	fmt.Printf("Account B balance: %s ETH\n", new(big.Float).Quo(new(big.Float).SetInt(balanceB), big.NewFloat(1e18)).String())
 
-	// dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
 	// pathOfScripts := filepath.Join(dir, "scripts/SimpleStorage.s.sol")
-
-	pathOfOutpost := "/Users/biphan/jackal/ict-evm/forge/src/JackalV1.sol" // NOTE: make compatible for everyone
+	dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
+	pathOfOutpost := filepath.Join(dir, "/../../forge/src/JackalV1.sol")
 
 	relays := []string{
 		"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -187,5 +192,5 @@ func (s *OutpostTestSuite) TestForge() {
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))
-	time.Sleep(10 * time.Hour)
+	time.Sleep(10 * time.Hour) // if this is active vscode thinks test fails
 }

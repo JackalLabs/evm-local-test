@@ -80,6 +80,8 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 		NetworkID:        s.network,
 		SkipPathCreation: true,
 	}))
+	// fails on x86 because we use biphan4/foundry docker image
+	// based on https://github.com/foundry-rs/foundry/blob/master/Dockerfile#L13
 
 	// NOTE: We can map all query request types to their gRPC method paths for cosmos chains?
 	// Easier/faster than making function(s) for jackal queries?

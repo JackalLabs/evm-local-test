@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -24,7 +25,7 @@ func PullMulberryImage(image string) error {
 	ctx := context.Background()
 
 	// Pull the Docker image
-	out, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
+	out, err := cli.ImagePull(ctx, image, types.ImagePullOptions{Platform: runtime.GOOS + "/" + runtime.GOARCH})
 	if err != nil {
 		return fmt.Errorf("failed to pull image: %w", err)
 	}
@@ -116,7 +117,6 @@ func ExecCommandInContainer(containerID string, command []string) error {
 	}
 
 	return nil
-
 }
 
 func StreamContainerLogs(containerID string) error {

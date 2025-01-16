@@ -7,8 +7,10 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
+	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/e2esuite"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -44,7 +46,39 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	}
 	fmt.Println("Anvil is ready at", rpcURL)
 
-	// setup Mulberry as well
+	// setup Mulberry, pull image
+	var image string
+	switch runtime.GOARCH {
+	case "arm":
+		image = "biphan4/mulberry:0.0.9"
+	case "amd64":
+		image = "anthonyjackallabs/mulberry"
+	default:
+		log.Fatalf("unsupported architecture %s", runtime.GOARCH)
+	}
+
+	if err := e2esuite.PullMulberryImage(image); err != nil {
+		log.Fatalf("Error pulling Docker image: %v", err)
+	}
+
+	// Get the absolute path of the local config file
+	localConfigPath, err := filepath.Abs("ethereum/e2esuite/mulberry_config.yaml")
+	if err != nil {
+		log.Fatalf("failed to resolve config path: %v", err)
+	}
+
+	// Run the container, stream logs
+	containerID, err := e2esuite.RunContainerWithConfig(image, "forge_mulberry", localConfigPath)
+	if err != nil {
+		log.Fatalf("Error running container: %v", err)
+	}
+	go e2esuite.StreamContainerLogs(containerID)
+
+	// Start Mulberry
+	startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}
+	if err := e2esuite.ExecCommandInContainer(containerID, startCommand); err != nil {
+		log.Fatalf("Error starting mulberry in container: %v", err)
+	}
 }
 
 func (s *OutpostTestSuite) TestForge() {

@@ -74,6 +74,12 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	}
 	go e2esuite.StreamContainerLogs(containerID)
 
+	// Execute a command inside the container
+	addressCommand := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}
+	if err := e2esuite.ExecCommandInContainer(containerID, addressCommand); err != nil {
+		log.Fatalf("Error creating wallet address in container: %v", err)
+	}
+
 	// Start Mulberry
 	startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}
 	if err := e2esuite.ExecCommandInContainer(containerID, startCommand); err != nil {

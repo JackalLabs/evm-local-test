@@ -6,8 +6,10 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"runtime"
+	"syscall"
 	"time"
 
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/e2esuite"
@@ -26,6 +28,7 @@ const (
 var (
 	ContractAddress string
 	logFile         *os.File
+	containerID     string
 )
 
 func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
@@ -71,7 +74,7 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	}
 
 	// Run the container, stream logs
-	containerID, err := e2esuite.RunContainerWithConfig(image, "mulberry", localConfigPath)
+	containerID, err = e2esuite.RunContainerWithConfig(image, "mulberry", localConfigPath)
 	if err != nil {
 		log.Fatalf("Error running container: %v", err)
 	}
@@ -112,6 +115,14 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 }
 
 func (s *OutpostTestSuite) TestForge() {
+	// intercept SIGTERM (Ctrl + C)
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		clean()
+	}()
+
 	ctx := context.Background()
 	s.SetupForgeSuite(ctx)
 
@@ -259,4 +270,10 @@ func (s *OutpostTestSuite) TestForge() {
 
 	time.Sleep(10 * time.Hour) // if this is active vscode thinks test fails
 	logFile.Close()
+}
+
+func clean() {
+	eth.ExecuteCommand("killall", []string{"anvil"})
+	e2esuite.StopContainer(containerID)
+	os.Exit(1)
 }

@@ -5,8 +5,12 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 
+	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/e2esuite"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -24,6 +28,8 @@ var ContractAddress string
 func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	// Start Anvil node
 	anvilArgs := []string{"--port", "8545", "--block-time", "1"}
+	// easiest way to install anvil is foundryup --install stable
+	// you can modify the code to use docker container with --network host
 	output, err := eth.ExecuteCommand("anvil", anvilArgs)
 	if err != nil {
 		fmt.Printf("Error starting Anvil: %s\n", err)
@@ -39,6 +45,68 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 		return
 	}
 	fmt.Println("Anvil is ready at", rpcURL)
+
+	// setup Mulberry, pull image
+	var image string
+	switch runtime.GOARCH {
+	case "arm64":
+		image = "biphan4/mulberry:0.0.9"
+	case "amd64":
+		image = "anthonyjackallabs/mulberry"
+	default:
+		log.Fatalf("unsupported architecture %s", runtime.GOARCH)
+	}
+
+	if err := e2esuite.PullMulberryImage(image); err != nil {
+		log.Fatalf("Error pulling Docker image: %v", err)
+	}
+
+	// Get the absolute path of the local config file
+	localConfigPath, err := filepath.Abs("e2esuite/mulberry_config.yaml")
+	if err != nil {
+		log.Fatalf("failed to resolve config path: %v", err)
+	}
+
+	// Run the container, stream logs
+	containerID, err := e2esuite.RunContainerWithConfig(image, "mulberry", localConfigPath)
+	if err != nil {
+		log.Fatalf("Error running container: %v", err)
+	}
+
+	logFile, err := os.Create("mulberry_logs.txt")
+	if err != nil {
+		log.Fatalf("Failed to create log file: %v", err)
+	}
+	defer logFile.Close()
+
+	go func() {
+		err := e2esuite.StreamContainerLogsToFile(containerID, logFile)
+		if err != nil {
+			log.Printf("Failed to stream Mulberry logs to file: %v", err)
+		}
+	}()
+
+	// Give mulberry a wallet
+	addressCommand := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}
+	if err := e2esuite.ExecCommandInContainer(containerID, addressCommand); err != nil {
+		log.Fatalf("Error creating wallet address in container: %v", err)
+	}
+
+	// Update the YAML file
+	rpcAddress := "http://127.0.0.1:8545"
+	wsAddress := "ws://host.docker.internal:8545"
+	if err := e2esuite.UpdateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
+		log.Fatalf("Failed to update mulberry config: %v", err)
+	}
+
+	log.Printf("Updated mulberry config with WS address: %s\n", wsAddress)
+
+	// Start Mulberry
+	// NOTE: get logs some other way, streaming the output of 'start' is blocking the rest of the code
+	startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}
+	if err := e2esuite.ExecCommandInContainer(containerID, startCommand); err != nil {
+		log.Fatalf("Error starting mulberry in container: %v", err)
+	}
 }
 
 func (s *OutpostTestSuite) TestForge() {
@@ -131,10 +199,9 @@ func (s *OutpostTestSuite) TestForge() {
 
 	fmt.Printf("Account B balance: %s ETH\n", new(big.Float).Quo(new(big.Float).SetInt(balanceB), big.NewFloat(1e18)).String())
 
-	// dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
 	// pathOfScripts := filepath.Join(dir, "scripts/SimpleStorage.s.sol")
-
-	pathOfOutpost := "/Users/biphan/jackal/ict-evm/forge/src/JackalV1.sol" // NOTE: make compatible for everyone
+	dir, _ := os.Getwd() // note: returns the root of this repository: ict-evm/
+	pathOfOutpost := filepath.Join(dir, "/../../forge/src/JackalV1.sol")
 
 	relays := []string{
 		"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -187,5 +254,5 @@ func (s *OutpostTestSuite) TestForge() {
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))
-	time.Sleep(10 * time.Hour)
+	time.Sleep(10 * time.Hour) // if this is active vscode thinks test fails
 }

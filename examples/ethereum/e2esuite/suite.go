@@ -3,6 +3,7 @@ package e2esuite
 import (
 	"context"
 	"log"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -80,6 +81,8 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 		NetworkID:        s.network,
 		SkipPathCreation: true,
 	}))
+	// fails on x86 because we use biphan4/foundry docker image
+	// based on https://github.com/foundry-rs/foundry/blob/master/Dockerfile#L13
 
 	// NOTE: We can map all query request types to their gRPC method paths for cosmos chains?
 	// Easier/faster than making function(s) for jackal queries?
@@ -116,7 +119,18 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 
 	log.Printf("Container is running with ID: %s\n", containerID)
 
-	go StreamContainerLogs(containerID)
+	logFile, err := os.Create("mulberry_logs.txt")
+	if err != nil {
+		log.Fatalf("Failed to create log file: %v", err)
+	}
+	defer logFile.Close()
+
+	go func() {
+		err := StreamContainerLogsToFile(containerID, logFile)
+		if err != nil {
+			log.Printf("Failed to stream Mulberry logs to file: %v", err)
+		}
+	}()
 
 	// Execute a command inside the container
 	addressCommand := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}
@@ -136,7 +150,7 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	// Update the YAML file
 	rpcAddress := "http://127.0.0.1:8545"
 	wsAddress := "ws://127.0.0.1:8545"
-	if err := updateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
+	if err := UpdateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
 		log.Fatalf("Failed to update mulberry config: %v", err)
 	}
 

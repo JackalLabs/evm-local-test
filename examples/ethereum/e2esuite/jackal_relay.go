@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -24,7 +25,7 @@ func PullMulberryImage(image string) error {
 	ctx := context.Background()
 
 	// Pull the Docker image
-	out, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
+	out, err := cli.ImagePull(ctx, image, types.ImagePullOptions{Platform: runtime.GOOS + "/" + runtime.GOARCH})
 	if err != nil {
 		return fmt.Errorf("failed to pull image: %w", err)
 	}
@@ -110,16 +111,15 @@ func ExecCommandInContainer(containerID string, command []string) error {
 	}
 	defer resp.Close()
 
-	// Stream the command output
-	if _, err := io.Copy(os.Stdout, resp.Reader); err != nil {
-		return fmt.Errorf("failed to read exec output: %w", err)
-	}
+	// // Stream the command output
+	// if _, err := io.Copy(os.Stdout, resp.Reader); err != nil {
+	// 	return fmt.Errorf("failed to read exec output: %w", err)
+	// }
 
 	return nil
-
 }
 
-func StreamContainerLogs(containerID string) error {
+func StreamContainerLogsToFile(containerID string, logFile *os.File) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return fmt.Errorf("failed to create Docker client: %w", err)
@@ -134,11 +134,12 @@ func StreamContainerLogs(containerID string) error {
 	}
 	defer out.Close()
 
-	_, err = io.Copy(os.Stdout, out) // Stream logs to the local terminal
+	// Redirect logs to the provided file
+	_, err = io.Copy(logFile, out)
 	return err
 }
 
-func updateMulberryConfigRPC(configPath, networkName, newRPC string, newWS string) error {
+func UpdateMulberryConfigRPC(configPath, networkName, newRPC string, newWS string) error {
 	// Open the YAML file
 	file, err := os.Open(configPath)
 	if err != nil {

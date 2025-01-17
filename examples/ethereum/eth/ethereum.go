@@ -127,12 +127,14 @@ func (e Ethereum) ForgeScript(deployer *ecdsa.PrivateKey, solidityContract strin
 
 	return stdoutBytes, nil
 }
+
 func (e Ethereum) ForgeCreate(deployer *ecdsa.PrivateKey, contractName, contractPath string, relays []string, priceFeed string) (string, error) {
 	// Prepare the forge create command
 	relaysArg := fmt.Sprintf("[%s]", strings.Join(relays, ",")) // Format array as [address1,address2,...]
 
 	cmdArgs := []string{
 		"create",
+		"--broadcast",
 		fmt.Sprintf("%s:%s", contractPath, contractName), // Format as "path:ContractName"
 		"--rpc-url", e.RPC,
 		"--private-key", fmt.Sprintf("0x%s", hex.EncodeToString(deployer.D.Bytes())),

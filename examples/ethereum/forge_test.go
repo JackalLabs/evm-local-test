@@ -23,7 +23,10 @@ const (
 	SimpleStorageAddressKey = "SimpleStorageAddress"
 )
 
-var ContractAddress string
+var (
+	ContractAddress string
+	logFile         *os.File
+)
 
 func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	// Start Anvil node
@@ -73,11 +76,10 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 		log.Fatalf("Error running container: %v", err)
 	}
 
-	logFile, err := os.Create("mulberry_logs.txt")
+	logFile, err = os.Create("mulberry_logs.txt")
 	if err != nil {
 		log.Fatalf("Failed to create log file: %v", err)
 	}
-	defer logFile.Close()
 
 	go func() {
 		err := e2esuite.StreamContainerLogsToFile(containerID, logFile)
@@ -254,5 +256,7 @@ func (s *OutpostTestSuite) TestForge() {
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))
+
 	time.Sleep(10 * time.Hour) // if this is active vscode thinks test fails
+	logFile.Close()
 }

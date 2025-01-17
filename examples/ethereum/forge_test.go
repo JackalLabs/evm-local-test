@@ -68,7 +68,7 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	}
 
 	// Run the container, stream logs
-	containerID, err := e2esuite.RunContainerWithConfig(image, "forge_mulberry", localConfigPath)
+	containerID, err := e2esuite.RunContainerWithConfig(image, "mulberry", localConfigPath)
 	if err != nil {
 		log.Fatalf("Error running container: %v", err)
 	}

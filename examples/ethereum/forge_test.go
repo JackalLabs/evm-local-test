@@ -62,7 +62,7 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	}
 
 	// Get the absolute path of the local config file
-	localConfigPath, err := filepath.Abs("ethereum/e2esuite/mulberry_config.yaml")
+	localConfigPath, err := filepath.Abs("e2esuite/mulberry_config.yaml")
 	if err != nil {
 		log.Fatalf("failed to resolve config path: %v", err)
 	}

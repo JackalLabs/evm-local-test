@@ -74,11 +74,20 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	}
 	go e2esuite.StreamContainerLogs(containerID)
 
-	// Execute a command inside the container
+	// Give mulberry a wallet
 	addressCommand := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}
 	if err := e2esuite.ExecCommandInContainer(containerID, addressCommand); err != nil {
 		log.Fatalf("Error creating wallet address in container: %v", err)
 	}
+
+	// Update the YAML file
+	rpcAddress := "http://127.0.0.1:8545"
+	wsAddress := "ws://127.0.0.1:8545"
+	if err := e2esuite.UpdateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
+		log.Fatalf("Failed to update mulberry config: %v", err)
+	}
+
+	log.Printf("Updated mulberry config with WS address: %s\n", wsAddress)
 
 	// Start Mulberry
 	startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}

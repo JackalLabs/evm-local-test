@@ -138,7 +138,7 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	// Update the YAML file
 	rpcAddress := "http://127.0.0.1:8545"
 	wsAddress := "ws://127.0.0.1:8545"
-	if err := updateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
+	if err := UpdateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
 		log.Fatalf("Failed to update mulberry config: %v", err)
 	}
 

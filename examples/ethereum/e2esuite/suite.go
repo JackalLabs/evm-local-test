@@ -3,6 +3,7 @@ package e2esuite
 import (
 	"context"
 	"log"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -118,7 +119,18 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 
 	log.Printf("Container is running with ID: %s\n", containerID)
 
-	go StreamContainerLogs(containerID)
+	logFile, err := os.Create("mulberry_logs.txt")
+	if err != nil {
+		log.Fatalf("Failed to create log file: %v", err)
+	}
+	defer logFile.Close()
+
+	go func() {
+		err := StreamContainerLogsToFile(containerID, logFile)
+		if err != nil {
+			log.Printf("Failed to stream Mulberry logs to file: %v", err)
+		}
+	}()
 
 	// Execute a command inside the container
 	addressCommand := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}

@@ -119,7 +119,7 @@ func ExecCommandInContainer(containerID string, command []string) error {
 	return nil
 }
 
-func StreamContainerLogs(containerID string) error {
+func StreamContainerLogsToFile(containerID string, logFile *os.File) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return fmt.Errorf("failed to create Docker client: %w", err)
@@ -134,7 +134,8 @@ func StreamContainerLogs(containerID string) error {
 	}
 	defer out.Close()
 
-	_, err = io.Copy(os.Stdout, out) // Stream logs to the local terminal
+	// Redirect logs to the provided file
+	_, err = io.Copy(logFile, out)
 	return err
 }
 

@@ -72,7 +72,19 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	if err != nil {
 		log.Fatalf("Error running container: %v", err)
 	}
-	go e2esuite.StreamContainerLogs(containerID)
+
+	logFile, err := os.Create("mulberry_logs.txt")
+	if err != nil {
+		log.Fatalf("Failed to create log file: %v", err)
+	}
+	defer logFile.Close()
+
+	go func() {
+		err := e2esuite.StreamContainerLogsToFile(containerID, logFile)
+		if err != nil {
+			log.Printf("Failed to stream Mulberry logs to file: %v", err)
+		}
+	}()
 
 	// Give mulberry a wallet
 	addressCommand := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}

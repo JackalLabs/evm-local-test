@@ -49,7 +49,7 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	// setup Mulberry, pull image
 	var image string
 	switch runtime.GOARCH {
-	case "arm":
+	case "arm64":
 		image = "biphan4/mulberry:0.0.9"
 	case "amd64":
 		image = "anthonyjackallabs/mulberry"

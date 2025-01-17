@@ -82,7 +82,7 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 
 	// Update the YAML file
 	rpcAddress := "http://127.0.0.1:8545"
-	wsAddress := "ws://127.0.0.1:8545"
+	wsAddress := "ws://host.docker.internal:8545"
 	if err := e2esuite.UpdateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
 		log.Fatalf("Failed to update mulberry config: %v", err)
 	}

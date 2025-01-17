@@ -102,6 +102,7 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	log.Printf("Updated mulberry config with WS address: %s\n", wsAddress)
 
 	// Start Mulberry
+	// NOTE: get logs some other way, streaming the output of 'start' is blocking the rest of the code
 	startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}
 	if err := e2esuite.ExecCommandInContainer(containerID, startCommand); err != nil {
 		log.Fatalf("Error starting mulberry in container: %v", err)

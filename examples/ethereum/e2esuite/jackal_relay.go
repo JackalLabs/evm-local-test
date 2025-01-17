@@ -111,10 +111,10 @@ func ExecCommandInContainer(containerID string, command []string) error {
 	}
 	defer resp.Close()
 
-	// Stream the command output
-	if _, err := io.Copy(os.Stdout, resp.Reader); err != nil {
-		return fmt.Errorf("failed to read exec output: %w", err)
-	}
+	// // Stream the command output
+	// if _, err := io.Copy(os.Stdout, resp.Reader); err != nil {
+	// 	return fmt.Errorf("failed to read exec output: %w", err)
+	// }
 
 	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	interchaintest "github.com/strangelove-ventures/interchaintest/v7"
+	testtypes "github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/types"
 	"github.com/strangelove-ventures/interchaintest/v7/ibc"
 )
 
@@ -59,53 +60,53 @@ var genesisAllowICH = map[string]interface{}{
 
 var ChainSpecs = []*interchaintest.ChainSpec{
 	// Ethereum
-	{
-		ChainConfig: ibc.ChainConfig{
-			Type:           "ethereum",
-			Name:           "ethereum",
-			ChainID:        "31337", // default anvil chain-id
-			Bech32Prefix:   "n/a",
-			CoinType:       "60",
-			Denom:          "wei",
-			GasPrices:      "0",
-			GasAdjustment:  0,
-			TrustingPeriod: "0",
-			NoHostMount:    false,
-			Images: []ibc.DockerImage{
-				{
-					Repository: "biphan4/foundry",
-					Version:    "latest",
-					UidGid:     "1000:1000",
-				},
-			},
-			Bin: "anvil",
-		},
-	},
-
-	// -- CANINED --
 	// {
 	// 	ChainConfig: ibc.ChainConfig{
-	// 		Type:    "cosmos",
-	// 		Name:    "canined",
-	// 		ChainID: "puppy-1",
+	// 		Type:           "ethereum",
+	// 		Name:           "ethereum",
+	// 		ChainID:        "31337", // default anvil chain-id
+	// 		Bech32Prefix:   "n/a",
+	// 		CoinType:       "60",
+	// 		Denom:          "wei",
+	// 		GasPrices:      "0",
+	// 		GasAdjustment:  0,
+	// 		TrustingPeriod: "0",
+	// 		NoHostMount:    false,
 	// 		Images: []ibc.DockerImage{
 	// 			{
-	// 				Repository: "biphan4/canine-evm", // FOR LOCAL IMAGE USE: Docker Image Name
-	// 				Version:    "0.0.0",              // FOR LOCAL IMAGE USE: Docker Image Tag
-	// 			}, // NOTE: Jackal Labs canary version atleast returns an error,
-	// 			// Every other version just stalls out
+	// 				Repository: "biphan4/foundry",
+	// 				Version:    "latest",
+	// 				UidGid:     "1000:1000",
+	// 			},
 	// 		},
-	// 		Bin:            "canined",
-	// 		Bech32Prefix:   "jkl",
-	// 		Denom:          "ujkl", // do we have to use ujkl or is jkl ok?
-	// 		GasPrices:      "0.00ujkl",
-	// 		GasAdjustment:  1.3,
-	// 		EncodingConfig: testtypes.JackaklEncoding(),
-	// 		TrustingPeriod: "508h",
-	// 		NoHostMount:    false,
-	// 		ModifyGenesis:  modifyGenesisAtPath(genesisAllowICH, "app_state"),
+	// 		Bin: "anvil",
 	// 	},
 	// },
+
+	// -- CANINED --
+	{
+		ChainConfig: ibc.ChainConfig{
+			Type:    "cosmos",
+			Name:    "canined",
+			ChainID: "puppy-1",
+			Images: []ibc.DockerImage{
+				{
+					Repository: "biphan4/canine-evm", // FOR LOCAL IMAGE USE: Docker Image Name
+					Version:    "0.0.0",              // FOR LOCAL IMAGE USE: Docker Image Tag
+				}, // NOTE: Jackal Labs canary version atleast returns an error,
+				// Every other version just stalls out
+			},
+			Bin:            "canined",
+			Bech32Prefix:   "jkl",
+			Denom:          "ujkl", // do we have to use ujkl or is jkl ok?
+			GasPrices:      "0.00ujkl",
+			GasAdjustment:  1.3,
+			EncodingConfig: testtypes.JackaklEncoding(),
+			TrustingPeriod: "508h",
+			NoHostMount:    false,
+			ModifyGenesis:  modifyGenesisAtPath(genesisAllowICH, "app_state"),
+		},
+	},
 }
 
 func modifyGenesisAtPath(insertedBlock map[string]interface{}, key string) func(ibc.ChainConfig, []byte) ([]byte, error) {

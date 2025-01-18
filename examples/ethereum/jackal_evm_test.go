@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/strangelove-ventures/interchaintest/v7"
+	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/chainconfig"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/e2esuite"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
@@ -22,6 +23,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
+
+var canineRPCAddress string
 
 func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// Start Anvil node
@@ -133,6 +136,19 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 		NetworkID:        s.Network,
 		SkipPathCreation: true,
 	}))
+
+	canine := chains[0].(*cosmos.CosmosChain)
+	canineRPC := canine.GetRPCAddress()
+	canineRPCAddress = canineRPC
+	log.Printf("canine-chain rpc is: %s", canineRPCAddress)
+	canineHostRPC := canine.GetHostRPCAddress()
+	log.Printf("canine-chain host rpc is: %s", canineHostRPC)
+
+	// returned canine-chain rpc is: http://puppy-1-fn-0-TestWithOutpostTestSuite_TestJackalEVMBridge:26657
+	// and canine-chain host rpc is: http://127.0.0.1:59026
+
+	// Mulberry just has to ping it using , e.g. http://host.docker.internal:59026 -- recreate this with each run
+	// So we should boot canine-chain before mulberry
 
 }
 

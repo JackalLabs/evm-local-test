@@ -275,5 +275,6 @@ func (s *OutpostTestSuite) TestForge() {
 func clean() {
 	eth.ExecuteCommand("killall", []string{"anvil"})
 	e2esuite.StopContainer(containerID)
+	time.Sleep(10 * time.Second)
 	os.Exit(1)
 }

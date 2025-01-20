@@ -70,6 +70,7 @@ func RunContainerWithConfig(image string, containerName string, localConfigPath 
 			Cmd: []string{"sleep", "3600"}, // Example: long-running command
 		},
 		&container.HostConfig{
+			NetworkMode: "host",
 			Binds: []string{
 				fmt.Sprintf("%s:/root/.mulberry/config.yaml", localConfigPath),
 			},

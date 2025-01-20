@@ -33,7 +33,7 @@ var (
 
 func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	// Start Anvil node
-	anvilArgs := []string{"--port", "8545", "--block-time", "1"}
+	anvilArgs := []string{"--port", "8545", "--block-time", "1", "--host", "0.0.0.0"}
 	// easiest way to install anvil is foundryup --install stable
 	// you can modify the code to use docker container with --network host
 	output, err := eth.ExecuteCommand("anvil", anvilArgs)
@@ -99,7 +99,7 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 
 	// Update the YAML file
 	rpcAddress := "http://127.0.0.1:8545"
-	wsAddress := "ws://host.docker.internal:8545"
+	wsAddress := "ws://127.0.0.1:8545"
 	if err := e2esuite.UpdateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
 		log.Fatalf("Failed to update mulberry config: %v", err)
 	}
@@ -243,7 +243,7 @@ func (s *OutpostTestSuite) TestForge() {
 	if err != nil {
 		log.Fatalf("Failed to connect to the Ethereum ws client: %v", err)
 	}
-	defer client.Close()
+	defer wsClient.Close()
 
 	go eth.ListenToLogs(wsClient, common.HexToAddress(ContractAddress))
 

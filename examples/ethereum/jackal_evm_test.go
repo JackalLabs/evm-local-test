@@ -47,6 +47,47 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	}
 	fmt.Println("Anvil is ready at", rpcURL)
 
+	// Start canine-chain with 3 validators
+	icChainSpecs := chainconfig.ChainSpecs
+
+	s.TestSuite.Logger = zaptest.NewLogger(s.T())
+	s.TestSuite.DockerClient, s.Network = interchaintest.DockerSetup(s.T())
+
+	cf := interchaintest.NewBuiltinChainFactory(s.Logger, icChainSpecs)
+
+	chains, err := cf.Chains(s.T().Name())
+	s.Require().NoError(err)
+
+	// canine-chain should be at index 0
+
+	ic := interchaintest.NewInterchain()
+	for _, chain := range chains {
+		ic = ic.AddChain(chain)
+	}
+
+	s.TestSuite.ExecRep = testreporter.NewNopReporter().RelayerExecReporter(s.T())
+
+	// TODO: Run this in a goroutine and wait for it to be ready
+	s.Require().NoError(ic.Build(ctx, s.ExecRep, interchaintest.InterchainBuildOptions{
+		TestName:         s.T().Name(),
+		Client:           s.DockerClient,
+		NetworkID:        s.Network,
+		SkipPathCreation: true,
+	}))
+
+	canine := chains[0].(*cosmos.CosmosChain)
+	canineRPC := canine.GetRPCAddress()
+	canineRPCAddress = canineRPC
+	log.Printf("canine-chain rpc is: %s", canineRPCAddress)
+	canineHostRPC := canine.GetHostRPCAddress()
+	log.Printf("canine-chain host rpc is: %s", canineHostRPC)
+
+	// returned canine-chain rpc is: http://puppy-1-fn-0-TestWithOutpostTestSuite_TestJackalEVMBridge:26657
+	// and canine-chain host rpc is: http://127.0.0.1:59026
+
+	// Mulberry just has to ping it using , e.g. http://host.docker.internal:59026 -- recreate this with each run
+	// So we should boot canine-chain before mulberry
+
 	// setup Mulberry, pull image
 	var image string
 	switch runtime.GOARCH {
@@ -108,47 +149,6 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	if err := e2esuite.ExecCommandInContainer(containerID, startCommand); err != nil {
 		log.Fatalf("Error starting mulberry in container: %v", err)
 	}
-
-	// Start canine-chain with 3 validators
-	icChainSpecs := chainconfig.ChainSpecs
-
-	s.TestSuite.Logger = zaptest.NewLogger(s.T())
-	s.TestSuite.DockerClient, s.Network = interchaintest.DockerSetup(s.T())
-
-	cf := interchaintest.NewBuiltinChainFactory(s.Logger, icChainSpecs)
-
-	chains, err := cf.Chains(s.T().Name())
-	s.Require().NoError(err)
-
-	// canine-chain should be at index 0
-
-	ic := interchaintest.NewInterchain()
-	for _, chain := range chains {
-		ic = ic.AddChain(chain)
-	}
-
-	s.TestSuite.ExecRep = testreporter.NewNopReporter().RelayerExecReporter(s.T())
-
-	// TODO: Run this in a goroutine and wait for it to be ready
-	s.Require().NoError(ic.Build(ctx, s.ExecRep, interchaintest.InterchainBuildOptions{
-		TestName:         s.T().Name(),
-		Client:           s.DockerClient,
-		NetworkID:        s.Network,
-		SkipPathCreation: true,
-	}))
-
-	canine := chains[0].(*cosmos.CosmosChain)
-	canineRPC := canine.GetRPCAddress()
-	canineRPCAddress = canineRPC
-	log.Printf("canine-chain rpc is: %s", canineRPCAddress)
-	canineHostRPC := canine.GetHostRPCAddress()
-	log.Printf("canine-chain host rpc is: %s", canineHostRPC)
-
-	// returned canine-chain rpc is: http://puppy-1-fn-0-TestWithOutpostTestSuite_TestJackalEVMBridge:26657
-	// and canine-chain host rpc is: http://127.0.0.1:59026
-
-	// Mulberry just has to ping it using , e.g. http://host.docker.internal:59026 -- recreate this with each run
-	// So we should boot canine-chain before mulberry
 
 }
 

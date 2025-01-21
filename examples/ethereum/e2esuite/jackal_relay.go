@@ -13,6 +13,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Function to force stop a container
+func StopContainer(containerID string) error {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return fmt.Errorf("failed to create Docker client: %w", err)
+	}
+
+	return cli.ContainerStop(context.Background(), containerID, container.StopOptions{})
+}
+
 // Utility for pulling and using an image of mulberry
 func PullMulberryImage(image string) error {
 	// Create a Docker client

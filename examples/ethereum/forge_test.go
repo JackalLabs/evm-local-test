@@ -6,8 +6,10 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"runtime"
+	"syscall"
 	"time"
 
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/e2esuite"
@@ -23,7 +25,11 @@ const (
 	SimpleStorageAddressKey = "SimpleStorageAddress"
 )
 
-var ContractAddress string
+var (
+	ContractAddress string
+	logFile         *os.File
+	containerID     string
+)
 
 func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	// Start Anvil node
@@ -68,16 +74,15 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	}
 
 	// Run the container, stream logs
-	containerID, err := e2esuite.RunContainerWithConfig(image, "mulberry", localConfigPath)
+	containerID, err = e2esuite.RunContainerWithConfig(image, "mulberry", localConfigPath)
 	if err != nil {
 		log.Fatalf("Error running container: %v", err)
 	}
 
-	logFile, err := os.Create("mulberry_logs.txt")
+	logFile, err = os.Create("mulberry_logs.txt")
 	if err != nil {
 		log.Fatalf("Failed to create log file: %v", err)
 	}
-	defer logFile.Close()
 
 	go func() {
 		err := e2esuite.StreamContainerLogsToFile(containerID, logFile)
@@ -110,6 +115,14 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 }
 
 func (s *OutpostTestSuite) TestForge() {
+	// intercept SIGTERM (Ctrl + C)
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		clean()
+	}()
+
 	ctx := context.Background()
 	s.SetupForgeSuite(ctx)
 
@@ -254,5 +267,14 @@ func (s *OutpostTestSuite) TestForge() {
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))
+
 	time.Sleep(10 * time.Hour) // if this is active vscode thinks test fails
+	logFile.Close()
+}
+
+func clean() {
+	eth.ExecuteCommand("killall", []string{"anvil"})
+	e2esuite.StopContainer(containerID)
+	time.Sleep(10 * time.Second)
+	os.Exit(1)
 }

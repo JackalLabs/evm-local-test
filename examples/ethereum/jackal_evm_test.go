@@ -137,7 +137,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 		log.Fatalf("Error creating wallet address in container: %v", err)
 	}
 
-	// Update the YAML file
+	// Update the YAML file to connect with anvil
 	rpcAddress := "http://127.0.0.1:8545"
 	wsAddress := "ws://host.docker.internal:8545"
 	if err := e2esuite.UpdateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
@@ -145,6 +145,12 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	}
 
 	log.Printf("Updated mulberry config with WS address: %s\n", wsAddress)
+
+	// TODO: we can put the bindings contract address here?
+	// Update the YAML file to connect with canine-chain
+	if err := e2esuite.UpdateMulberryJackalConfigRPC(localConfigPath, updatedCanineHostRPC); err != nil {
+		log.Fatalf("Failed to update mulberry's jackal config: %v", err)
+	}
 
 	// Start Mulberry
 	// NOTE: get logs some other way, streaming the output of 'start' is blocking the rest of the code

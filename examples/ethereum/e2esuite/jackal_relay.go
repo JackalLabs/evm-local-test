@@ -177,3 +177,35 @@ func UpdateMulberryConfigRPC(configPath, networkName, newRPC string, newWS strin
 
 	return nil
 }
+
+func UpdateMulberryJackalConfigRPC(configPath, newRPC string) error {
+	// Open the YAML file
+	file, err := os.Open(configPath)
+	if err != nil {
+		return fmt.Errorf("failed to open config file: %w", err)
+	}
+	defer file.Close()
+
+	// Decode YAML into a struct
+	var config MulberryConfig
+	decoder := yaml.NewDecoder(file)
+	if err := decoder.Decode(&config); err != nil {
+		return fmt.Errorf("failed to decode config file: %w", err)
+	}
+
+	config.JackalConfig.RPC = newRPC
+
+	// Write the updated config back to the file
+	file, err = os.Create(configPath) // Truncate and overwrite the file
+	if err != nil {
+		return fmt.Errorf("failed to write to config file: %w", err)
+	}
+	defer file.Close()
+
+	encoder := yaml.NewEncoder(file)
+	if err := encoder.Encode(&config); err != nil {
+		return fmt.Errorf("failed to encode updated config: %w", err)
+	}
+
+	return nil
+}

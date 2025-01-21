@@ -33,12 +33,12 @@ type TestSuite struct {
 	suite.Suite
 
 	ChainA         eth.Ethereum
-	ethTestnetType string
+	EthTestnetType string
 	ChainB         *cosmos.CosmosChain
 	UserB          ibc.Wallet // At some point we will introduce the jackal user
-	dockerClient   *dockerclient.Client
-	network        string
-	logger         *zap.Logger
+	DockerClient   *dockerclient.Client
+	Network        string
+	Logger         *zap.Logger
 	ExecRep        *testreporter.RelayerExecReporter
 
 	// Don't need light clients for now. Only concerned about deploying outpost and
@@ -55,10 +55,10 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	// At this step, the ibc team use a case statement to decide whether to boot up a POW or POS Eth chain.
 	// We might need to do this in the future.
 
-	s.logger = zaptest.NewLogger(s.T())
-	s.dockerClient, s.network = interchaintest.DockerSetup(s.T())
+	s.Logger = zaptest.NewLogger(s.T())
+	s.DockerClient, s.Network = interchaintest.DockerSetup(s.T())
 
-	cf := interchaintest.NewBuiltinChainFactory(s.logger, icChainSpecs)
+	cf := interchaintest.NewBuiltinChainFactory(s.Logger, icChainSpecs)
 
 	chains, err := cf.Chains(s.T().Name())
 	s.Require().NoError(err)
@@ -77,8 +77,8 @@ func (s *TestSuite) SetupSuite(ctx context.Context) {
 	// TODO: Run this in a goroutine and wait for it to be ready
 	s.Require().NoError(ic.Build(ctx, s.ExecRep, interchaintest.InterchainBuildOptions{
 		TestName:         s.T().Name(),
-		Client:           s.dockerClient,
-		NetworkID:        s.network,
+		Client:           s.DockerClient,
+		NetworkID:        s.Network,
 		SkipPathCreation: true,
 	}))
 	// fails on x86 because we use biphan4/foundry docker image

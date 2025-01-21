@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/strangelove-ventures/interchaintest/v7"
@@ -81,6 +82,8 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	log.Printf("canine-chain rpc is: %s", canineRPCAddress)
 	canineHostRPC := canine.GetHostRPCAddress()
 	log.Printf("canine-chain host rpc is: %s", canineHostRPC)
+	updatedCanineHostRPC := strings.Replace(canineHostRPC, "127.0.0.1", "host.docker.internal", 1)
+	log.Printf("updatedCanineHostRPC is: %s", updatedCanineHostRPC)
 
 	// returned canine-chain rpc is: http://puppy-1-fn-0-TestWithOutpostTestSuite_TestJackalEVMBridge:26657
 	// and canine-chain host rpc is: http://127.0.0.1:59026

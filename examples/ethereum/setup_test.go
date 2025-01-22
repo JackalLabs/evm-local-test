@@ -213,6 +213,10 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 
 	// Seems that pesky <?> keeps appearing in our terminal
 	// TODO: log raw bytes, log the String length, dump hex values
+
+	verifyString(reconstructedString)
+	// so it looks like the pesky ? symbol was found, then it's likely the address creation will fail
+	// We'll find out below:
 }
 
 // Helper function to remove non-printable characters
@@ -224,4 +228,17 @@ func removeNonPrintable(input string) string {
 		}
 	}
 	return string(result)
+}
+
+func verifyString(content string) {
+	fmt.Printf("String Length: %d\n", len(content))
+
+	for i, r := range content {
+		if r == '�' { // Check for the replacement character
+			fmt.Printf("Found pesky symbol at index %d\n", i)
+			return
+		}
+	}
+
+	fmt.Println("No pesky symbol found in the string.")
 }

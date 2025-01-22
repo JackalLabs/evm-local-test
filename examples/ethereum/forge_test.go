@@ -120,7 +120,7 @@ func (s *OutpostTestSuite) TestForge() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		clean()
+		cleanForgeSuite()
 	}()
 
 	ctx := context.Background()
@@ -272,7 +272,7 @@ func (s *OutpostTestSuite) TestForge() {
 	logFile.Close()
 }
 
-func clean() {
+func cleanForgeSuite() {
 	eth.ExecuteCommand("killall", []string{"anvil"})
 	e2esuite.StopContainer(containerID)
 	time.Sleep(10 * time.Second)

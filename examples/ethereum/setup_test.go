@@ -88,6 +88,25 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// Mulberry just has to ping it using , e.g. http://host.docker.internal:59026 -- recreate this with each run
 	// So we should boot canine-chain before mulberry
 
+	// WARNING: This number can't be too high or the faucet can't seem to have enough to fund accounts
+	// Perfect number is between 10_000_000_000 and 1_000_000_000_000
+	const userFunds = int64(1_000_000_000_000)
+	// userFundsInt := math.NewInt(userFunds) formerly used 'cosmossdk.io/math int64 type'
+
+	// Why did I have to do this?
+	// I thought ic build process assinged the chain automatically?
+	s.ChainB = canine
+
+	// this is the seed phrase for the danny user that appears in all of canine-chain's testing scripts
+	userBSeed := "brief enhance flee chest rabbit matter chaos clever lady enable luggage arrange hint " +
+		"quarter change float embark canoe chalk husband legal dignity music web"
+	userB, err := interchaintest.GetAndFundTestUserWithMnemonic(ctx, "jkl", userBSeed, userFunds, s.ChainB)
+	s.Require().NoError(err)
+
+	s.UserB = userB //the jackal user
+
+	// Do we need a second Jackal User?
+
 	// setup Mulberry, pull image
 	var image string
 	switch runtime.GOARCH {

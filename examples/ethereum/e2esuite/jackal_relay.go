@@ -1,6 +1,7 @@
 package e2esuite
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -208,4 +209,41 @@ func UpdateMulberryJackalConfigRPC(configPath, newRPC string) error {
 	}
 
 	return nil
+}
+
+func RetrieveFileFromContainer(containerID, filePath string) (string, error) {
+	// Create a Docker client
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return "", fmt.Errorf("failed to create Docker client: %w", err)
+	}
+
+	// Context for the Docker API calls
+	ctx := context.Background()
+
+	// Execute a command to cat the file contents
+	execConfig := types.ExecConfig{
+		Cmd:          []string{"cat", filePath},
+		AttachStdout: true,
+		AttachStderr: true,
+	}
+	execIDResp, err := cli.ContainerExecCreate(ctx, containerID, execConfig)
+	if err != nil {
+		return "", fmt.Errorf("failed to create exec instance: %w", err)
+	}
+
+	// Start the exec process
+	resp, err := cli.ContainerExecAttach(ctx, execIDResp.ID, types.ExecStartCheck{})
+	if err != nil {
+		return "", fmt.Errorf("failed to attach to exec instance: %w", err)
+	}
+	defer resp.Close()
+
+	// Read the output from the command
+	var output bytes.Buffer
+	if _, err := io.Copy(&output, resp.Reader); err != nil {
+		return "", fmt.Errorf("failed to read file contents: %w", err)
+	}
+
+	return output.String(), nil
 }

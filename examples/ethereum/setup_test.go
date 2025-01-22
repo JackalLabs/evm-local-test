@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/strangelove-ventures/interchaintest/v7"
 	"github.com/strangelove-ventures/interchaintest/v7/chain/cosmos"
@@ -175,4 +176,50 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 		log.Fatalf("Error starting mulberry in container: %v", err)
 	}
 
+	// TODO: remove this sleep eventually if it's not needed
+	time.Sleep(30 * time.Second)
+	// retrieve mulberry's jkl seed
+
+	filePath := "/root/.mulberry/seed.json"
+
+	contents, err := e2esuite.RetrieveFileFromContainer(containerID, filePath)
+	if err != nil {
+		log.Fatalf("Failed to retrieve file: %v", err)
+	}
+
+	fmt.Printf("Retrieved content length: %d\n", len(contents))
+
+	fmt.Printf("Contents of %s:\n%s\n", filePath, contents)
+	fmt.Printf("===============\n\n\n")
+	fmt.Printf("%s\n", contents)
+
+	// There seems to be a # attached to the last word of the seed
+	// Trim trailing `#` and whitespace
+	cleanedContents := strings.TrimRight(contents, "# \n")
+	fmt.Printf("Cleaned Contents of %s:\n%s\n", filePath, cleanedContents)
+
+	// Build a new clean string
+	var words []string
+	for _, word := range strings.Fields(cleanedContents) {
+		cleanWord := removeNonPrintable(word)
+		words = append(words, cleanWord)
+	}
+	reconstructedString := strings.Join(words, " ")
+
+	fmt.Println("Reconstructed String:")
+	fmt.Println(reconstructedString)
+
+	// Seems that pesky <?> keeps appearing in our terminal
+	// TODO: log raw bytes, log the String length, dump hex values
+}
+
+// Helper function to remove non-printable characters
+func removeNonPrintable(input string) string {
+	var result []rune
+	for _, r := range input {
+		if unicode.IsPrint(r) {
+			result = append(result, r)
+		}
+	}
+	return string(result)
 }

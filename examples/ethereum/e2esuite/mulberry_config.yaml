@@ -1,5 +1,5 @@
 jackal_config:
-  rpc: http://host.docker.internal:52104
+  rpc: http://host.docker.internal:60235
   grpc: custom-grpc.polkachu.com:17590
   seed_file: seed.json
   contract: jkl1customcontractaddress

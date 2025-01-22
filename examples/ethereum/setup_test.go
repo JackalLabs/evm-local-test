@@ -208,6 +208,8 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 
 	fmt.Println("Reconstructed String:")
 	fmt.Println(reconstructedString)
+	fmt.Printf("String Length: %d\n", len(reconstructedString))
+	fmt.Printf("Raw Bytes: %q\n", []byte(cleanedContents))
 
 	// Seems that pesky <?> keeps appearing in our terminal
 	// TODO: log raw bytes, log the String length, dump hex values

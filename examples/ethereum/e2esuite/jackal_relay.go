@@ -21,7 +21,24 @@ func StopContainer(containerID string) error {
 		return fmt.Errorf("failed to create Docker client: %w", err)
 	}
 
-	return cli.ContainerStop(context.Background(), containerID, container.StopOptions{})
+	cli.ContainerStop(context.Background(), containerID, container.StopOptions{})
+	return nil
+}
+
+// Function to stop all containers from an image
+func StopContainerByImage(imageName string) error {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return fmt.Errorf("failed to create Docker client: %w", err)
+	}
+
+	containers, _ := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	for _, c := range containers {
+		if c.Image == imageName {
+			cli.ContainerStop(context.Background(), c.ID, container.StopOptions{})
+		}
+	}
+	return nil
 }
 
 // Utility for pulling and using an image of mulberry

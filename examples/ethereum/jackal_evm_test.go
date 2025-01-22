@@ -6,9 +6,11 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"time"
 
+	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/e2esuite"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -18,6 +20,13 @@ import (
 )
 
 func (s *OutpostTestSuite) TestJackalEVMBridge() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		cleanJackalEVMBridgeSuite()
+	}()
+
 	ctx := context.Background()
 	s.SetupJackalEVMBridgeSuite(ctx)
 
@@ -168,4 +177,12 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 		fmt.Println("made it to the end")
 	}))
 	time.Sleep(10 * time.Hour) // if this is active vscode thinks test fails
+}
+
+func cleanJackalEVMBridgeSuite() {
+	eth.ExecuteCommand("killall", []string{"anvil"})
+	e2esuite.StopContainer(jackalEVMContainerID)
+	// e2esuite.StopContainerByImage("biphan4/canine-evm:0.0.0") doesn't run at all
+	time.Sleep(10 * time.Second)
+	os.Exit(1)
 }

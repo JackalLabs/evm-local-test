@@ -20,7 +20,10 @@ import (
 	"go.uber.org/zap/zaptest"
 )
 
-var canineRPCAddress string
+var (
+	canineRPCAddress     string
+	jackalEVMContainerID string
+)
 
 func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// Start Anvil node
@@ -130,7 +133,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	}
 
 	// Run the container, stream logs
-	containerID, err := e2esuite.RunContainerWithConfig(image, "mulberry", localConfigPath)
+	jackalEVMContainerID, err = e2esuite.RunContainerWithConfig(image, "mulberry", localConfigPath)
 	if err != nil {
 		log.Fatalf("Error running container: %v", err)
 	}
@@ -142,7 +145,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	defer logFile.Close()
 
 	go func() {
-		err := e2esuite.StreamContainerLogsToFile(containerID, logFile)
+		err := e2esuite.StreamContainerLogsToFile(jackalEVMContainerID, logFile)
 		if err != nil {
 			log.Printf("Failed to stream Mulberry logs to file: %v", err)
 		}
@@ -150,7 +153,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 
 	// Give mulberry a wallet
 	addressCommand := []string{"sh", "-c", "mulberry wallet address >> /proc/1/fd/1 2>> /proc/1/fd/2"}
-	if err := e2esuite.ExecCommandInContainer(containerID, addressCommand); err != nil {
+	if err := e2esuite.ExecCommandInContainer(jackalEVMContainerID, addressCommand); err != nil {
 		log.Fatalf("Error creating wallet address in container: %v", err)
 	}
 
@@ -172,7 +175,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// Start Mulberry
 	// NOTE: get logs some other way, streaming the output of 'start' is blocking the rest of the code
 	startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}
-	if err := e2esuite.ExecCommandInContainer(containerID, startCommand); err != nil {
+	if err := e2esuite.ExecCommandInContainer(jackalEVMContainerID, startCommand); err != nil {
 		log.Fatalf("Error starting mulberry in container: %v", err)
 	}
 
@@ -182,7 +185,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 
 	filePath := "/root/.mulberry/seed.json"
 
-	contents, err := e2esuite.RetrieveFileFromContainer(containerID, filePath)
+	contents, err := e2esuite.RetrieveFileFromContainer(jackalEVMContainerID, filePath)
 	if err != nil {
 		log.Fatalf("Failed to retrieve file: %v", err)
 	}

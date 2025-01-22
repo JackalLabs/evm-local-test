@@ -213,8 +213,8 @@ func (e Ethereum) CastSend(contractAddress, functionSig string, args []string, r
 	output := stdoutBuf.String()
 	var txHash string
 	for _, line := range strings.Split(output, "\n") {
-		if strings.HasPrefix(line, "Transaction hash:") {
-			txHash = strings.TrimSpace(strings.Split(line, ":")[1])
+		if strings.HasPrefix(line, "transactionHash") {
+			txHash = strings.TrimSpace(strings.Fields(line)[1])
 			break
 		}
 	}

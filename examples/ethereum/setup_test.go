@@ -24,7 +24,7 @@ var canineRPCAddress string
 
 func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// Start Anvil node
-	anvilArgs := []string{"--port", "8545", "--block-time", "1"}
+	anvilArgs := []string{"--port", "8545", "--block-time", "1", "--host", "0.0.0.0"}
 	// easiest way to install anvil is foundryup --install stable
 	// you can modify the code to use docker container with --network host
 	output, err := eth.ExecuteCommand("anvil", anvilArgs)
@@ -104,7 +104,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	userB, err := interchaintest.GetAndFundTestUserWithMnemonic(ctx, "jkl", userBSeed, userFunds, s.ChainB)
 	s.Require().NoError(err)
 
-	s.UserB = userB //the jackal user
+	s.UserB = userB // the jackal user
 
 	// Do we need a second Jackal User?
 
@@ -156,7 +156,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 
 	// Update the YAML file to connect with anvil
 	rpcAddress := "http://127.0.0.1:8545"
-	wsAddress := "ws://host.docker.internal:8545"
+	wsAddress := "ws://127.0.0.1:8545"
 	if err := e2esuite.UpdateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
 		log.Fatalf("Failed to update mulberry config: %v", err)
 	}

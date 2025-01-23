@@ -259,8 +259,10 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 
 	fmt.Println(factoryContractAddress)
 	// TODO: we can put the bindings contract address here?
+
 	// Update the YAML file to connect with canine-chain
-	if err := e2esuite.UpdateMulberryJackalConfigRPC(localConfigPath, updatedCanineHostRPC); err != nil {
+	// WARNING: if Mulberry can't broadcast the CosmWasm tx, this is the first point of inspection
+	if err := e2esuite.UpdateMulberryJackalConfigRPC(localConfigPath, canineHostRPC); err != nil { // Mulberry should be able to see local host
 		log.Fatalf("Failed to update mulberry's jackal config: %v", err)
 	}
 

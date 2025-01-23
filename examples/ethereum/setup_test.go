@@ -175,7 +175,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	}
 
 	// TODO: remove this sleep eventually if it's not needed
-	time.Sleep(30 * time.Second)
+	time.Sleep(5 * time.Second)
 	// retrieve mulberry's jkl seed
 
 	filePath := "/root/.mulberry/seed.json"
@@ -255,7 +255,9 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// s.Require().NoError(err)
 	fmt.Printf("factory contract address: %s\n", contractAddr)
 	// TODO: give Mulberry factory contract address
+
 	// NOTE: Looks like Mulberry is calling the factory
+	// TODO: double check that mulberry is in fact calling the factory, and not the bindings directly
 
 }
 

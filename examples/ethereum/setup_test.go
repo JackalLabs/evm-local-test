@@ -161,12 +161,6 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 
 	log.Printf("Updated mulberry config with WS address: %s\n", wsAddress)
 
-	// TODO: we can put the bindings contract address here?
-	// Update the YAML file to connect with canine-chain
-	if err := e2esuite.UpdateMulberryJackalConfigRPC(localConfigPath, updatedCanineHostRPC); err != nil {
-		log.Fatalf("Failed to update mulberry's jackal config: %v", err)
-	}
-
 	// Start Mulberry
 	// NOTE: get logs some other way, streaming the output of 'start' is blocking the rest of the code
 	startCommand := []string{"sh", "-c", "mulberry start >> /proc/1/fd/1 2>> /proc/1/fd/2"}
@@ -258,6 +252,17 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 
 	// NOTE: Looks like Mulberry is calling the factory
 	// TODO: double check that mulberry is in fact calling the factory, and not the bindings directly
+
+	// NOTE: The contractAddr can't be retrived at this time because of sdk tx parsing errors we noted in 'jackal-evm' repo
+	// We can fix that later but for now, we'll just hard code the consistent factory contract address
+	factoryContractAddress := "jkl14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9scsc9nr"
+
+	fmt.Println(factoryContractAddress)
+	// TODO: we can put the bindings contract address here?
+	// Update the YAML file to connect with canine-chain
+	if err := e2esuite.UpdateMulberryJackalConfigRPC(localConfigPath, updatedCanineHostRPC); err != nil {
+		log.Fatalf("Failed to update mulberry's jackal config: %v", err)
+	}
 
 }
 

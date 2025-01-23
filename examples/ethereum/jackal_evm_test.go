@@ -133,6 +133,7 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	ContractAddress = returnedContractAddr
 	fmt.Printf("JackalBridge deployed at: %s\n", ContractAddress)
 
+	// NOTE: The name of the network shouldn't matter when trying to establish a connection
 	// WARNING: double check finality. I think it's 2 but double check
 	if err := e2esuite.UpdateMulberryConfigEVM(localConfigPath, "Ethereum Sepolia", ContractAddress, int(chainID.Int64())); err != nil {
 		log.Fatalf("Failed to update mulberry config: %v", err)

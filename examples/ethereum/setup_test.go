@@ -19,6 +19,7 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/e2esuite"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
 	factorytypes "github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/types/bindingsfactory"
+	logger "github.com/strangelove-ventures/interchaintest/v7/examples/logger"
 	"github.com/strangelove-ventures/interchaintest/v7/testreporter"
 
 	"go.uber.org/zap/zaptest"
@@ -263,6 +264,10 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 
 	fmt.Println(factoryContractAddress)
 	// TODO: we can put the bindings contract address here?
+
+	contractState, stateErr := e2esuite.GetState(ctx, s.ChainB, factoryContractAddress)
+	s.Require().NoError(stateErr)
+	logger.LogInfo(contractState)
 
 	// Update the YAML file to connect with canine-chain
 	// WARNING: if Mulberry can't broadcast the CosmWasm tx, this is the first point of inspection

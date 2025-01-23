@@ -180,7 +180,7 @@ func UpdateMulberryConfigRPC(configPath, networkName, newRPC string, newWS strin
 	return nil
 }
 
-func UpdateMulberryConfigEVMBridge(configPath, networkName, evmBridgeAddress string) error {
+func UpdateMulberryConfigEVMBridge(configPath, networkName, evmBridgeAddress string, chainID int) error {
 	// Open the YAML file
 	file, err := os.Open(configPath)
 	if err != nil {
@@ -199,6 +199,7 @@ func UpdateMulberryConfigEVMBridge(configPath, networkName, evmBridgeAddress str
 	for i, network := range config.NetworksConfig {
 		if network.Name == networkName {
 			config.NetworksConfig[i].Contract = evmBridgeAddress
+			config.NetworksConfig[i].ChainID = chainID
 			break
 		}
 	}

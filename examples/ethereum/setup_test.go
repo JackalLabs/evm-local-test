@@ -205,20 +205,23 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	fmt.Printf("String Length: %d\n", len(reconstructedString))
 	fmt.Printf("Raw Bytes: %q\n", []byte(cleanedContents))
 
-	// Seems that pesky <?> keeps appearing in our terminal
-	// TODO: log raw bytes, log the String length, dump hex values
+	// Remove the pesky symbol at index 0 if it exists
+	if len(reconstructedString) > 0 && []rune(reconstructedString)[0] == '\uFFFD' {
+		// Remove the pesky symbol at index 0
+		reconstructedString = string([]rune(reconstructedString)[1:])
+	}
 
+	// Confirm the pesky symbol is gone
 	verifyString(reconstructedString)
-	// so it looks like the pesky ? symbol was found, then it's likely the address creation will fail
-	// We'll find out below:
 
+	// Proceed with the cleaned string
 	mulberrySeed := reconstructedString
 
 	userB, err := interchaintest.GetAndFundTestUserWithMnemonic(ctx, "jkl", mulberrySeed, userFunds, s.ChainB)
 	s.Require().NoError(err)
 
 	s.UserB = userB // the jackal user
-	fmt.Printf("Mulberry's jkl account: %s\n", userB)
+	fmt.Printf("Mulberry's jkl account: %s\n", userB.FormattedAddress())
 
 }
 

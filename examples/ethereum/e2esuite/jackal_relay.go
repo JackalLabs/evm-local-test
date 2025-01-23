@@ -180,7 +180,8 @@ func UpdateMulberryConfigRPC(configPath, networkName, newRPC string, newWS strin
 	return nil
 }
 
-func UpdateMulberryJackalConfigRPC(configPath, newRPC string) error {
+// Update canine-chain rpc and bindings contract address
+func UpdateMulberryJackalConfig(configPath, newRPC string, bindingsFactory string) error {
 	// Open the YAML file
 	file, err := os.Open(configPath)
 	if err != nil {
@@ -196,6 +197,7 @@ func UpdateMulberryJackalConfigRPC(configPath, newRPC string) error {
 	}
 
 	config.JackalConfig.RPC = newRPC
+	config.JackalConfig.Contract = bindingsFactory
 
 	// Write the updated config back to the file
 	file, err = os.Create(configPath) // Truncate and overwrite the file

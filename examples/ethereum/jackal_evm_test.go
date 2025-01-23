@@ -133,7 +133,8 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	ContractAddress = returnedContractAddr
 	fmt.Printf("JackalBridge deployed at: %s\n", ContractAddress)
 
-	if err := e2esuite.UpdateMulberryConfigEVMBridge(localConfigPath, "Ethereum Sepolia", ContractAddress, int(chainID.Int64())); err != nil {
+	// WARNING: double check finality. I think it's 2 but double check
+	if err := e2esuite.UpdateMulberryConfigEVM(localConfigPath, "Ethereum Sepolia", ContractAddress, int(chainID.Int64())); err != nil {
 		log.Fatalf("Failed to update mulberry config: %v", err)
 	}
 

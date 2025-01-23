@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -16,7 +18,9 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/chainconfig"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/e2esuite"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
+	factorytypes "github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/types/bindingsfactory"
 	"github.com/strangelove-ventures/interchaintest/v7/testreporter"
+
 	"go.uber.org/zap/zaptest"
 )
 
@@ -236,6 +240,23 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	s.Require().NoError(error)
 	fmt.Println(BindingsCodeId)
 
+	// codeId is string and needs to be converted to uint64
+	BindingsCodeIdAsInt, err := strconv.ParseInt(BindingsCodeId, 10, 64)
+	s.Require().NoError(err)
+
+	// NOTE: We should have imported factorytypes from jackal-evm but that repo is too big and messy
+	// which causes the 'module source tree too large' error when running: go get github.com/JackalLabs/jackal-evm@e75940283544bade2b37bf1e0523563289184aca
+
+	// TODO: import factorytypes from 'jackal-evm' when jackal-evm is cleaned up
+	// Instantiate the factory, giving it the codeId of the filetree bindings contract
+	instantiateMsg := factorytypes.InstantiateMsg{BindingsCodeId: int(BindingsCodeIdAsInt)}
+
+	contractAddr, _ := s.ChainB.InstantiateContract(ctx, s.UserB.KeyName(), FactoryCodeId, toString(instantiateMsg), false, "--gas", "500000", "--admin", s.UserB.KeyName())
+	// s.Require().NoError(err)
+	fmt.Printf("factory contract address: %s\n", contractAddr)
+	// TODO: give Mulberry factory contract address
+	// NOTE: Looks like Mulberry is calling the factory
+
 }
 
 // Helper function to remove non-printable characters
@@ -260,4 +281,17 @@ func verifyString(content string) {
 	}
 
 	fmt.Println("No pesky symbol found in the string.")
+}
+
+// log address of bindings contract
+// create bindings factory contract
+
+// toString converts the message to a string using json
+func toString(msg any) string {
+	bz, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(bz)
 }

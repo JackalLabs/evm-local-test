@@ -23,9 +23,6 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	// Fund jackal account
 
-	// This is the user in our cosmwasm_signer, so we ensure they have funds
-	s.FundAddressChainB(ctx, s.UserB.FormattedAddress())
-
 	// Connect to Anvil RPC
 	rpcURL := "http://127.0.0.1:8545"
 	client, err := ethclient.Dial(rpcURL)

@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/e2esuite"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -131,6 +132,10 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	ContractAddress = returnedContractAddr
 	fmt.Printf("JackalBridge deployed at: %s\n", ContractAddress)
+
+	if err := e2esuite.UpdateMulberryConfigEVMBridge(localConfigPath, "Ethereum Sepolia", ContractAddress); err != nil {
+		log.Fatalf("Failed to update mulberry config: %v", err)
+	}
 
 	// Note: I wonder if this is Mulberry's issue: trying to use an RPC client
 	// To establish the WS connection?

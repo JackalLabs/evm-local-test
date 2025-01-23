@@ -24,7 +24,10 @@ import (
 	"go.uber.org/zap/zaptest"
 )
 
-var canineRPCAddress string
+var (
+	canineRPCAddress string
+	localConfigPath  string
+)
 
 func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// Start Anvil node
@@ -122,10 +125,11 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	}
 
 	// Get the absolute path of the local config file
-	localConfigPath, err := filepath.Abs("e2esuite/mulberry_config.yaml")
+	createdLocalConfigPath, err := filepath.Abs("e2esuite/mulberry_config.yaml")
 	if err != nil {
 		log.Fatalf("failed to resolve config path: %v", err)
 	}
+	localConfigPath = createdLocalConfigPath
 
 	// Run the container, stream logs
 	containerID, err := e2esuite.RunContainerWithConfig(image, "mulberry", localConfigPath)

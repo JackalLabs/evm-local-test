@@ -223,6 +223,19 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	s.UserB = userB // the jackal user
 	fmt.Printf("Mulberry's jkl account: %s\n", userB.FormattedAddress())
 
+	// This is the user in our cosmwasm_signer, so we ensure they have funds
+	s.FundAddressChainB(ctx, s.UserB.FormattedAddress())
+
+	// Store code of bindings factory
+	FactoryCodeId, err := s.ChainB.StoreContract(ctx, s.UserB.KeyName(), "../wasm_artifacts/bindings_factory.wasm")
+	s.Require().NoError(err)
+	fmt.Println(FactoryCodeId)
+
+	// Store code of filetree bindings
+	BindingsCodeId, error := s.ChainB.StoreContract(ctx, s.UserB.KeyName(), "../wasm_artifacts/canine_bindings.wasm")
+	s.Require().NoError(error)
+	fmt.Println(BindingsCodeId)
+
 }
 
 // Helper function to remove non-printable characters

@@ -98,13 +98,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// I thought ic build process assinged the chain automatically?
 	s.ChainB = canine
 
-	// this is the seed phrase for the danny user that appears in all of canine-chain's testing scripts
-	userBSeed := "brief enhance flee chest rabbit matter chaos clever lady enable luggage arrange hint " +
-		"quarter change float embark canoe chalk husband legal dignity music web"
-	userB, err := interchaintest.GetAndFundTestUserWithMnemonic(ctx, "jkl", userBSeed, userFunds, s.ChainB)
-	s.Require().NoError(err)
-
-	s.UserB = userB // the jackal user
+	// Danny's seed phrase was here before
 
 	// Do we need a second Jackal User?
 
@@ -217,6 +211,15 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	verifyString(reconstructedString)
 	// so it looks like the pesky ? symbol was found, then it's likely the address creation will fail
 	// We'll find out below:
+
+	mulberrySeed := reconstructedString
+
+	userB, err := interchaintest.GetAndFundTestUserWithMnemonic(ctx, "jkl", mulberrySeed, userFunds, s.ChainB)
+	s.Require().NoError(err)
+
+	s.UserB = userB // the jackal user
+	fmt.Printf("Mulberry's jkl account: %s\n", userB)
+
 }
 
 // Helper function to remove non-printable characters

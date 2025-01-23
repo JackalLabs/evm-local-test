@@ -182,7 +182,7 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 func cleanJackalEVMBridgeSuite() {
 	eth.ExecuteCommand("killall", []string{"anvil"})
 	e2esuite.StopContainer(jackalEVMContainerID)
-	// e2esuite.StopContainerByImage("biphan4/canine-evm:0.0.0") doesn't run at all
+	e2esuite.StopContainerByImage("biphan4/canine-evm:0.0.0")
 	time.Sleep(10 * time.Second)
 	os.Exit(1)
 }

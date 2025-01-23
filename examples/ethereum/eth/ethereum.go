@@ -313,7 +313,11 @@ func ListenToLogs(client *ethclient.Client, contractAddress common.Address) {
 	for {
 		select {
 		case err := <-sub.Err():
-			log.Fatalf("Subscription error: %v", err)
+			if strings.Contains(err.Error(), "unexpected EOF") {
+				log.Printf("Websocket error: %v", err) // triggered on ctrl-c
+			} else {
+				log.Fatalf("Subscription error: %v", err)
+			}
 		case vLog := <-logs:
 			// Decode the `Debug` event
 			if len(vLog.Data) > 0 {

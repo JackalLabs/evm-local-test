@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"runtime"
 
@@ -22,6 +23,7 @@ func StopContainer(containerID string) error {
 	}
 
 	cli.ContainerStop(context.Background(), containerID, container.StopOptions{})
+	log.Printf("killed container %v", containerID)
 	return nil
 }
 
@@ -32,10 +34,15 @@ func StopContainerByImage(imageName string) error {
 		return fmt.Errorf("failed to create Docker client: %w", err)
 	}
 
-	containers, _ := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{}) // all active containers
+	if err != nil {
+		return fmt.Errorf("failed to list Docker containers: %w", err)
+	}
+
 	for _, c := range containers {
 		if c.Image == imageName {
 			cli.ContainerStop(context.Background(), c.ID, container.StopOptions{})
+			log.Printf("killed container %v", c.ID)
 		}
 	}
 	return nil

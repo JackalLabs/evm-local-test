@@ -275,6 +275,19 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 		log.Fatalf("Failed to update mulberry's jackal config: %v", err)
 	}
 
+	// Fund the factory so it can fund the bindings
+	s.FundAddressChainB(ctx, factoryContractAddress)
+
+	msg := factorytypes.ExecuteMsg{
+		CreateBindings: &factorytypes.ExecuteMsg_CreateBindings{UserEvmAddress: &evmUserA},
+	}
+	// WARNING: possible that we made a bindings contract for the wrong address. Or the address was empty when we sent the below tx
+	// and it failed silently.
+	res, _ := s.ChainB.ExecuteContract(ctx, s.UserB.KeyName(), factoryContractAddress, msg.ToString(), "--gas", "500000")
+	// NOTE: cannot parse res because of cosmos-sdk issue noted before, so we will get an error
+	// fortunately, we went into the docker container to confirm that the post key msg does get saved into canine-chain
+	fmt.Println(res)
+
 }
 
 // Helper function to remove non-printable characters

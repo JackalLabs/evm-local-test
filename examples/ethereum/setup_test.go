@@ -278,8 +278,10 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// Fund the factory so it can fund the bindings
 	s.FundAddressChainB(ctx, factoryContractAddress)
 
+	fmt.Printf("evm user A: %s", EvmUserA)
+
 	msg := factorytypes.ExecuteMsg{
-		CreateBindings: &factorytypes.ExecuteMsg_CreateBindings{UserEvmAddress: &evmUserA},
+		CreateBindings: &factorytypes.ExecuteMsg_CreateBindings{UserEvmAddress: &EvmUserA},
 	}
 	// WARNING: possible that we made a bindings contract for the wrong address. Or the address was empty when we sent the below tx
 	// and it failed silently.
@@ -293,7 +295,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 
 	factoryFundingExecuteMsg := factorytypes.ExecuteMsg{
 		FundBindings: &factorytypes.ExecuteMsg_FundBindings{
-			EvmAddress: &evmUserA,
+			EvmAddress: &EvmUserA,
 			Amount:     &fundingAmount,
 		},
 	}

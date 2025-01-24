@@ -18,7 +18,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-var evmUserA string
+var EvmUserA string
 
 func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	ctx := context.Background()
@@ -63,7 +63,12 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	// Get the public address of Account A
 	addressA := crypto.PubkeyToAddress(privKeyA.PublicKey)
 	fmt.Println(addressA)
-	evmUserA = addressA.String()
+	addressAString := addressA.String()
+	EvmUserA = addressAString
+	addressAHex := addressA.Hex()
+
+	fmt.Printf("addressAString: %s", addressAString)
+	fmt.Printf("addressAHex: %s", addressAHex)
 
 	// Check Account A's nonce
 	nonce, err := client.PendingNonceAt(context.Background(), addressA)

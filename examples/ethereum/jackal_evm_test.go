@@ -155,8 +155,8 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	go eth.ListenToLogs(wsClient, common.HexToAddress(ContractAddress))
 
 	// Define the parameters for the `postFile` function
-	merkle := "placeholder-merkle-root"
-	filesize := "1048576" // 1 MB in bytes (as string)
+	merkle := "placeholder-merkle-root" // WARNING: possible invalid merkle
+	filesize := "1048576"               // 1 MB in bytes (as string) // WARNING: possible invalid file size
 
 	// Given value
 	value := big.NewInt(5000000000000)
@@ -167,6 +167,15 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	txHash, err := ethWrapper.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA, value)
 	fmt.Printf("tx hash is: %s\n", txHash)
+	if err != nil {
+		log.Fatalf("Failed to call `postFile` on the contract: %v", err)
+	}
+
+	time.Sleep(30 * time.Second)
+
+	// try again
+	txHash1, err := ethWrapper.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA, value)
+	fmt.Printf("tx hash is: %s\n", txHash1)
 	if err != nil {
 		log.Fatalf("Failed to call `postFile` on the contract: %v", err)
 	}

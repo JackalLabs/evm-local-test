@@ -28,6 +28,7 @@ import (
 var (
 	canineRPCAddress string
 	localConfigPath  string
+	factoryAddress   string
 )
 
 func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
@@ -261,6 +262,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// NOTE: The contractAddr can't be retrived at this time because of sdk tx parsing errors we noted in 'jackal-evm' repo
 	// We can fix that later but for now, we'll just hard code the consistent factory contract address
 	factoryContractAddress := "jkl14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9scsc9nr"
+	factoryAddress = factoryContractAddress
 
 	fmt.Println(factoryContractAddress)
 	// TODO: we can put the bindings contract address here?
@@ -279,31 +281,6 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	s.FundAddressChainB(ctx, factoryContractAddress)
 
 	fmt.Printf("evm user A: %s", EvmUserA)
-
-	msg := factorytypes.ExecuteMsg{
-		CreateBindings: &factorytypes.ExecuteMsg_CreateBindings{UserEvmAddress: &EvmUserA},
-	}
-	// WARNING: possible that we made a bindings contract for the wrong address. Or the address was empty when we sent the below tx
-	// and it failed silently.
-	res, _ := s.ChainB.ExecuteContract(ctx, s.UserB.KeyName(), factoryContractAddress, msg.ToString(), "--gas", "500000")
-	// NOTE: cannot parse res because of cosmos-sdk issue noted before, so we will get an error
-	// fortunately, we went into the docker container to confirm that the post key msg does get saved into canine-chain
-	fmt.Println(res)
-
-	// Let's have the factory give evmUserA 200jkl
-	fundingAmount := int64(200_000_000)
-
-	factoryFundingExecuteMsg := factorytypes.ExecuteMsg{
-		FundBindings: &factorytypes.ExecuteMsg_FundBindings{
-			EvmAddress: &EvmUserA,
-			Amount:     &fundingAmount,
-		},
-	}
-
-	fundingRes, _ := s.ChainB.ExecuteContract(ctx, s.UserB.KeyName(), factoryContractAddress, factoryFundingExecuteMsg.ToString(), "--gas", "500000")
-	fmt.Println(fundingRes)
-
-	time.Sleep(30 * time.Second)
 
 }
 

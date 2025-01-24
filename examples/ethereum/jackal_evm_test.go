@@ -11,6 +11,7 @@ import (
 
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/e2esuite"
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/eth"
+	factorytypes "github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/types/bindingsfactory"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -69,6 +70,31 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	fmt.Printf("addressAString: %s", addressAString)
 	fmt.Printf("addressAHex: %s", addressAHex)
+
+	msg := factorytypes.ExecuteMsg{
+		CreateBindings: &factorytypes.ExecuteMsg_CreateBindings{UserEvmAddress: &EvmUserA},
+	}
+	// WARNING: possible that we made a bindings contract for the wrong address. Or the address was empty when we sent the below tx
+	// and it failed silently.
+	res, _ := s.ChainB.ExecuteContract(ctx, s.UserB.KeyName(), factoryAddress, msg.ToString(), "--gas", "500000")
+	// NOTE: cannot parse res because of cosmos-sdk issue noted before, so we will get an error
+	// fortunately, we went into the docker container to confirm that the post key msg does get saved into canine-chain
+	fmt.Println(res)
+
+	// Let's have the factory give evmUserA 200jkl
+	fundingAmount := int64(200_000_000)
+
+	factoryFundingExecuteMsg := factorytypes.ExecuteMsg{
+		FundBindings: &factorytypes.ExecuteMsg_FundBindings{
+			EvmAddress: &EvmUserA,
+			Amount:     &fundingAmount,
+		},
+	}
+
+	fundingRes, _ := s.ChainB.ExecuteContract(ctx, s.UserB.KeyName(), factoryAddress, factoryFundingExecuteMsg.ToString(), "--gas", "500000")
+	fmt.Println(fundingRes)
+
+	time.Sleep(30 * time.Second)
 
 	// Check Account A's nonce
 	nonce, err := client.PendingNonceAt(context.Background(), addressA)

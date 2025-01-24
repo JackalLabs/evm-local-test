@@ -288,6 +288,21 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// fortunately, we went into the docker container to confirm that the post key msg does get saved into canine-chain
 	fmt.Println(res)
 
+	// Let's have the factory give evmUserA 200jkl
+	fundingAmount := int64(200_000_000)
+
+	factoryFundingExecuteMsg := factorytypes.ExecuteMsg{
+		FundBindings: &factorytypes.ExecuteMsg_FundBindings{
+			EvmAddress: &evmUserA,
+			Amount:     &fundingAmount,
+		},
+	}
+
+	fundingRes, _ := s.ChainB.ExecuteContract(ctx, s.UserB.KeyName(), factoryContractAddress, factoryFundingExecuteMsg.ToString(), "--gas", "500000")
+	fmt.Println(fundingRes)
+
+	time.Sleep(30 * time.Second)
+
 }
 
 // Helper function to remove non-printable characters

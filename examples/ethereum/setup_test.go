@@ -116,7 +116,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	var image string
 	switch runtime.GOARCH {
 	case "arm64":
-		image = "biphan4/mulberry:0.0.9"
+		image = "biphan4/mulberry:0.0.10"
 	case "amd64":
 		image = "anthonyjackallabs/mulberry"
 	default:

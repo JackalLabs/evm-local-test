@@ -24,6 +24,7 @@ var EvmUserA string
 func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	ctx := context.Background()
 	s.SetupJackalEVMBridgeSuite(ctx)
+	defer logFile.Close()
 
 	// Fund jackal account
 

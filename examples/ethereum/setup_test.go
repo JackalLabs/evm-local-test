@@ -85,12 +85,13 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	canineRPC := canine.GetRPCAddress()
 	canineRPCAddress = canineRPC
 	log.Printf("canine-chain rpc is: %s", canineRPCAddress)
-	canineHostRPC := canine.GetHostRPCAddress()
-	log.Printf("canine-chain host rpc is: %s", canineHostRPC)
+	caninedHostRPC := canine.GetHostRPCAddress()
+	log.Printf("canine-chain host rpc is: %s", caninedHostRPC)
+	caninedHostGRPC := canine.GetHostGRPCAddress()
 
 	// NOTE: I think Mulberry should be able to listen to canine-chain using '127.0.0.1' now
 	// TODO: change it back to local host then
-	updatedCanineHostRPC := strings.Replace(canineHostRPC, "127.0.0.1", "host.docker.internal", 1)
+	updatedCanineHostRPC := strings.Replace(caninedHostRPC, "127.0.0.1", "host.docker.internal", 1)
 	log.Printf("updatedCanineHostRPC is: %s", updatedCanineHostRPC)
 
 	// returned canine-chain rpc is: http://puppy-1-fn-0-TestWithOutpostTestSuite_TestJackalEVMBridge:26657
@@ -165,7 +166,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 		log.Fatalf("Failed to update mulberry config: %v", err)
 	}
 
-	if err := e2esuite.UpdateMulberryJackalRPC(localConfigPath, canineHostRPC); err != nil {
+	if err := e2esuite.UpdateMulberryJackalRPC(localConfigPath, caninedHostRPC, caninedHostGRPC); err != nil {
 		log.Fatalf("Failed to update canine-chain rpc address: %v", err)
 	}
 
@@ -277,7 +278,7 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 
 	// Update the YAML file to connect with canine-chain
 	// WARNING: if Mulberry can't broadcast the CosmWasm tx, this is the first point of inspection
-	if err := e2esuite.UpdateMulberryJackalConfig(localConfigPath, canineHostRPC, factoryContractAddress); err != nil { // Mulberry should be able to see local host
+	if err := e2esuite.UpdateMulberryJackalConfig(localConfigPath, caninedHostRPC, factoryContractAddress); err != nil { // Mulberry should be able to see local host
 		log.Fatalf("Failed to update mulberry's jackal config: %v", err)
 	}
 

@@ -253,9 +253,9 @@ func UpdateMulberryJackalConfig(configPath, newRPC string, bindingsFactory strin
 	return nil
 }
 
-// Update canine-chain rpc
+// Update canine-chain rpc and grpc
 // TODO: need to unify or separate--choose one
-func UpdateMulberryJackalRPC(configPath, newRPC string) error {
+func UpdateMulberryJackalRPC(configPath, newRPC string, newGRPC string) error {
 	// Open the YAML file
 	file, err := os.Open(configPath)
 	if err != nil {
@@ -271,6 +271,7 @@ func UpdateMulberryJackalRPC(configPath, newRPC string) error {
 	}
 
 	config.JackalConfig.RPC = newRPC
+	config.JackalConfig.GRPC = newGRPC
 
 	// Write the updated config back to the file
 	file, err = os.Create(configPath) // Truncate and overwrite the file

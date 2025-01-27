@@ -34,7 +34,7 @@ var (
 
 func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// Start Anvil node
-	anvilArgs := []string{"--port", "8545", "--block-time", "1", "--host", "0.0.0.0"}
+	anvilArgs := []string{"--port", "8545", "--block-time", "1", "--host", "0.0.0.0", "-vvvvv"}
 	// easiest way to install anvil is foundryup --install stable
 	// you can modify the code to use docker container with --network host
 	output, err := eth.ExecuteCommand("anvil", anvilArgs)

@@ -160,7 +160,7 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	// Deploy the JackalBridge contract
 	// The deployer is the owner of the contract, and who is allowed to relay the event--I think?
-	returnedContractAddr, err := ethWrapper.ForgeCreate(privKeyA, "JackalBridge", pathOfOutpost, relays, priceFeed)
+	returnedContractAddr, err := ethWrapper.ForgeCreate(privKeyA, "JackalBridge", pathOfOutpost, relays, priceFeed) // fails with "abi: attempting to unmarshal an empty string while arguments are expected", shows up a few seconds later
 	if err != nil {
 		log.Fatalf("Failed to deploy simple storage: %v", err)
 	}

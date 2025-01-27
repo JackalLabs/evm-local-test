@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"math/big"
@@ -191,7 +191,10 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	merkleBytes := []byte{0x01, 0x02, 0x03, 0x04}
 
-	merkleBase64 := base64.StdEncoding.EncodeToString(merkleBytes)
+	// Encode to hexadecimal
+	merkleHex := hex.EncodeToString(merkleBytes)
+
+	fmt.Println("Merkle Hex:", merkleHex)
 
 	filesize := "1048576" // 1 MB in bytes (as string) // WARNING: possible invalid file size
 
@@ -200,7 +203,7 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	// Call `postFile` on the deployed JackalBridge contract
 	functionSig := "postFile(string,uint64)"
-	args := []string{merkleBase64, filesize}
+	args := []string{merkleHex, filesize}
 
 	txHash, err := ethWrapper.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA, value)
 	fmt.Printf("tx hash is: %s\n", txHash)

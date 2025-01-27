@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"math/big"
@@ -187,15 +188,19 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	go eth.ListenToLogs(wsClient, common.HexToAddress(ContractAddress))
 
 	// Define the parameters for the `postFile` function
-	merkle := "placeholder-merkle-root" // WARNING: possible invalid merkle
-	filesize := "1048576"               // 1 MB in bytes (as string) // WARNING: possible invalid file size
+
+	merkleBytes := []byte{0x01, 0x02, 0x03, 0x04}
+
+	merkleBase64 := base64.StdEncoding.EncodeToString(merkleBytes)
+
+	filesize := "1048576" // 1 MB in bytes (as string) // WARNING: possible invalid file size
 
 	// Given value
 	value := big.NewInt(5000000000000)
 
 	// Call `postFile` on the deployed JackalBridge contract
 	functionSig := "postFile(string,uint64)"
-	args := []string{merkle, filesize}
+	args := []string{merkleBase64, filesize}
 
 	txHash, err := ethWrapper.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA, value)
 	fmt.Printf("tx hash is: %s\n", txHash)

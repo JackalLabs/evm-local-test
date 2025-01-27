@@ -1,5 +1,5 @@
 jackal_config:
-  rpc: http://127.0.0.1:54360
+  rpc: http://127.0.0.1:55427
   grpc: custom-grpc.polkachu.com:17590
   seed_file: seed.json
   contract: jkl14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9scsc9nr

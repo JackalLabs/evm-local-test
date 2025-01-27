@@ -165,6 +165,10 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 		log.Fatalf("Failed to update mulberry config: %v", err)
 	}
 
+	if err := e2esuite.UpdateMulberryJackalRPC(localConfigPath, canineHostRPC); err != nil {
+		log.Fatalf("Failed to update canine-chain rpc address: %v", err)
+	}
+
 	log.Printf("Updated mulberry config with WS address: %s\n", wsAddress)
 
 	// Start Mulberry

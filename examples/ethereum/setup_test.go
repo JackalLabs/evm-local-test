@@ -29,11 +29,12 @@ var (
 	canineRPCAddress string
 	localConfigPath  string
 	factoryAddress   string
+	logFile          *os.File
 )
 
 func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// Start Anvil node
-	anvilArgs := []string{"--port", "8545", "--block-time", "1", "--host", "0.0.0.0"}
+	anvilArgs := []string{"--port", "8545", "--block-time", "1", "--host", "0.0.0.0", "-vvvvv"}
 	// easiest way to install anvil is foundryup --install stable
 	// you can modify the code to use docker container with --network host
 	output, err := eth.ExecuteCommand("anvil", anvilArgs)
@@ -139,11 +140,10 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 		log.Fatalf("Error running container: %v", err)
 	}
 
-	logFile, err := os.Create("mulberry_logs.txt")
+	logFile, err = os.Create("mulberry_logs.txt")
 	if err != nil {
 		log.Fatalf("Failed to create log file: %v", err)
 	}
-	defer logFile.Close()
 
 	go func() {
 		err := e2esuite.StreamContainerLogsToFile(containerID, logFile)
@@ -281,7 +281,6 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	s.FundAddressChainB(ctx, factoryContractAddress)
 
 	fmt.Printf("evm user A: %s", EvmUserA)
-
 }
 
 // Helper function to remove non-printable characters

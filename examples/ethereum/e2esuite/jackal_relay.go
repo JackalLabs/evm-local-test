@@ -11,6 +11,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 	"gopkg.in/yaml.v2"
 )
 
@@ -137,7 +138,7 @@ func StreamContainerLogsToFile(containerID string, logFile *os.File) error {
 	defer out.Close()
 
 	// Redirect logs to the provided file
-	_, err = io.Copy(logFile, out)
+	_, err = stdcopy.StdCopy(logFile, logFile, out)
 	return err
 }
 

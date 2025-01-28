@@ -142,22 +142,39 @@ func StreamContainerLogsToFile(containerID string, logFile *os.File) error {
 	return err
 }
 
-func UpdateMulberryConfigRPC(configPath, networkName, newRPC string, newWS string) error {
+func decodeConfigYAML(configPath string) (config MulberryConfig, err error) {
 	// Open the YAML file
 	file, err := os.Open(configPath)
 	if err != nil {
-		return fmt.Errorf("failed to open config file: %w", err)
+		return config, fmt.Errorf("failed to open config file: %w", err)
 	}
 	defer file.Close()
 
 	// Decode YAML into a struct
-	var config MulberryConfig
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(&config); err != nil {
-		return fmt.Errorf("failed to decode config file: %w", err)
+		return config, fmt.Errorf("failed to decode config file: %w", err)
 	}
+	return
+}
 
-	// Update the RPC address for the specified network
+func encodeConfigYAML(configPath string, config MulberryConfig) (err error) {
+	// Write the updated config back to the file
+	file, err := os.Create(configPath) // Truncate and overwrite the file
+	if err != nil {
+		return fmt.Errorf("failed to write to config file: %w", err)
+	}
+	defer file.Close()
+
+	encoder := yaml.NewEncoder(file)
+	if err := encoder.Encode(&config); err != nil {
+		return fmt.Errorf("failed to encode updated config: %w", err)
+	}
+	return nil
+}
+
+func UpdateMulberryConfigRPC(configPath, networkName, newRPC string, newWS string) (err error) {
+	config, err := decodeConfigYAML(configPath)
 	for i, network := range config.NetworksConfig {
 		if network.Name == networkName {
 			config.NetworksConfig[i].RPC = newRPC
@@ -165,38 +182,14 @@ func UpdateMulberryConfigRPC(configPath, networkName, newRPC string, newWS strin
 			break
 		}
 	}
-
-	// Write the updated config back to the file
-	file, err = os.Create(configPath) // Truncate and overwrite the file
 	if err != nil {
-		return fmt.Errorf("failed to write to config file: %w", err)
+		return
 	}
-	defer file.Close()
-
-	encoder := yaml.NewEncoder(file)
-	if err := encoder.Encode(&config); err != nil {
-		return fmt.Errorf("failed to encode updated config: %w", err)
-	}
-
-	return nil
+	return encodeConfigYAML(configPath, config)
 }
 
-func UpdateMulberryConfigEVM(configPath, networkName, evmBridgeAddress string, chainID int) error {
-	// Open the YAML file
-	file, err := os.Open(configPath)
-	if err != nil {
-		return fmt.Errorf("failed to open config file: %w", err)
-	}
-	defer file.Close()
-
-	// Decode YAML into a struct
-	var config MulberryConfig
-	decoder := yaml.NewDecoder(file)
-	if err := decoder.Decode(&config); err != nil {
-		return fmt.Errorf("failed to decode config file: %w", err)
-	}
-
-	// Update the RPC address for the specified network
+func UpdateMulberryConfigEVM(configPath, networkName, evmBridgeAddress string, chainID int) (err error) {
+	config, err := decodeConfigYAML(configPath)
 	for i, network := range config.NetworksConfig {
 		if network.Name == networkName {
 			config.NetworksConfig[i].Contract = evmBridgeAddress
@@ -204,20 +197,10 @@ func UpdateMulberryConfigEVM(configPath, networkName, evmBridgeAddress string, c
 			break
 		}
 	}
-
-	// Write the updated config back to the file
-	file, err = os.Create(configPath) // Truncate and overwrite the file
 	if err != nil {
-		return fmt.Errorf("failed to write to config file: %w", err)
+		return
 	}
-	defer file.Close()
-
-	encoder := yaml.NewEncoder(file)
-	if err := encoder.Encode(&config); err != nil {
-		return fmt.Errorf("failed to encode updated config: %w", err)
-	}
-
-	return nil
+	return encodeConfigYAML(configPath, config)
 }
 
 // Update canine-chain rpc and bindings contract address

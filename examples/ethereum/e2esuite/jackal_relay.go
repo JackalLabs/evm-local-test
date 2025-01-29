@@ -1,9 +1,11 @@
 package e2esuite
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"runtime"
 
@@ -20,7 +22,30 @@ func StopContainer(containerID string) error {
 		return fmt.Errorf("failed to create Docker client: %w", err)
 	}
 
-	return cli.ContainerStop(context.Background(), containerID, container.StopOptions{})
+	cli.ContainerStop(context.Background(), containerID, container.StopOptions{})
+	log.Printf("killed container %v", containerID)
+	return nil
+}
+
+// Function to stop all containers from an image
+func StopContainerByImage(imageName string) error {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return fmt.Errorf("failed to create Docker client: %w", err)
+	}
+
+	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{}) // all active containers
+	if err != nil {
+		return fmt.Errorf("failed to list Docker containers: %w", err)
+	}
+
+	for _, c := range containers {
+		if c.Image == imageName {
+			cli.ContainerStop(context.Background(), c.ID, container.StopOptions{})
+			log.Printf("killed container %v", c.ID)
+		}
+	}
+	return nil
 }
 
 // Utility for pulling and using an image of mulberry
@@ -187,4 +212,73 @@ func UpdateMulberryConfigRPC(configPath, networkName, newRPC string, newWS strin
 	}
 
 	return nil
+}
+
+func UpdateMulberryJackalConfigRPC(configPath, newRPC string) error {
+	// Open the YAML file
+	file, err := os.Open(configPath)
+	if err != nil {
+		return fmt.Errorf("failed to open config file: %w", err)
+	}
+	defer file.Close()
+
+	// Decode YAML into a struct
+	var config MulberryConfig
+	decoder := yaml.NewDecoder(file)
+	if err := decoder.Decode(&config); err != nil {
+		return fmt.Errorf("failed to decode config file: %w", err)
+	}
+
+	config.JackalConfig.RPC = newRPC
+
+	// Write the updated config back to the file
+	file, err = os.Create(configPath) // Truncate and overwrite the file
+	if err != nil {
+		return fmt.Errorf("failed to write to config file: %w", err)
+	}
+	defer file.Close()
+
+	encoder := yaml.NewEncoder(file)
+	if err := encoder.Encode(&config); err != nil {
+		return fmt.Errorf("failed to encode updated config: %w", err)
+	}
+
+	return nil
+}
+
+func RetrieveFileFromContainer(containerID, filePath string) (string, error) {
+	// Create a Docker client
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return "", fmt.Errorf("failed to create Docker client: %w", err)
+	}
+
+	// Context for the Docker API calls
+	ctx := context.Background()
+
+	// Execute a command to cat the file contents
+	execConfig := types.ExecConfig{
+		Cmd:          []string{"cat", filePath},
+		AttachStdout: true,
+		AttachStderr: true,
+	}
+	execIDResp, err := cli.ContainerExecCreate(ctx, containerID, execConfig)
+	if err != nil {
+		return "", fmt.Errorf("failed to create exec instance: %w", err)
+	}
+
+	// Start the exec process
+	resp, err := cli.ContainerExecAttach(ctx, execIDResp.ID, types.ExecStartCheck{})
+	if err != nil {
+		return "", fmt.Errorf("failed to attach to exec instance: %w", err)
+	}
+	defer resp.Close()
+
+	// Read the output from the command
+	var output bytes.Buffer
+	if _, err := io.Copy(&output, resp.Reader); err != nil {
+		return "", fmt.Errorf("failed to read file contents: %w", err)
+	}
+
+	return output.String(), nil
 }

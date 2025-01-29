@@ -213,8 +213,8 @@ func (e Ethereum) CastSend(contractAddress, functionSig string, args []string, r
 	output := stdoutBuf.String()
 	var txHash string
 	for _, line := range strings.Split(output, "\n") {
-		if strings.HasPrefix(line, "Transaction hash:") {
-			txHash = strings.TrimSpace(strings.Split(line, ":")[1])
+		if strings.HasPrefix(line, "transactionHash") {
+			txHash = strings.TrimSpace(strings.Fields(line)[1])
 			break
 		}
 	}
@@ -313,7 +313,11 @@ func ListenToLogs(client *ethclient.Client, contractAddress common.Address) {
 	for {
 		select {
 		case err := <-sub.Err():
-			log.Fatalf("Subscription error: %v", err)
+			if strings.Contains(err.Error(), "unexpected EOF") {
+				log.Printf("Websocket error: %v", err) // triggered on ctrl-c
+			} else {
+				log.Fatalf("Subscription error: %v", err)
+			}
 		case vLog := <-logs:
 			// Decode the `Debug` event
 			if len(vLog.Data) > 0 {

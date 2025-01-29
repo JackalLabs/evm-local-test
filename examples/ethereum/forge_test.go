@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"path/filepath"
 	"runtime"
-	"syscall"
 	"time"
 
 	"github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/e2esuite"
@@ -117,10 +116,10 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 func (s *OutpostTestSuite) TestForge() {
 	// intercept SIGTERM (Ctrl + C)
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(c, os.Interrupt)
 	go func() {
 		<-c
-		clean()
+		cleanForgeSuite()
 	}()
 
 	ctx := context.Background()
@@ -272,7 +271,7 @@ func (s *OutpostTestSuite) TestForge() {
 	logFile.Close()
 }
 
-func clean() {
+func cleanForgeSuite() {
 	eth.ExecuteCommand("killall", []string{"anvil"})
 	e2esuite.StopContainer(containerID)
 	time.Sleep(10 * time.Second)

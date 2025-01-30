@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -23,11 +24,14 @@ const (
 	SimpleStorageAddressKey = "SimpleStorageAddress"
 )
 
-var ContractAddress string
+var (
+	ContractAddress string
+	containerID     string
+)
 
 func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	// Start Anvil node
-	anvilArgs := []string{"--port", "8545", "--block-time", "1"}
+	anvilArgs := []string{"--port", "8545", "--block-time", "1", "--host", "0.0.0.0"}
 	// easiest way to install anvil is foundryup --install stable
 	// you can modify the code to use docker container with --network host
 	output, err := eth.ExecuteCommand("anvil", anvilArgs)
@@ -68,16 +72,15 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 	}
 
 	// Run the container, stream logs
-	containerID, err := e2esuite.RunContainerWithConfig(image, "mulberry", localConfigPath)
+	containerID, err = e2esuite.RunContainerWithConfig(image, "mulberry", localConfigPath)
 	if err != nil {
 		log.Fatalf("Error running container: %v", err)
 	}
 
-	logFile, err := os.Create("mulberry_logs.txt")
+	logFile, err = os.Create("mulberry_logs.txt")
 	if err != nil {
 		log.Fatalf("Failed to create log file: %v", err)
 	}
-	defer logFile.Close()
 
 	go func() {
 		err := e2esuite.StreamContainerLogsToFile(containerID, logFile)
@@ -94,7 +97,7 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 
 	// Update the YAML file
 	rpcAddress := "http://127.0.0.1:8545"
-	wsAddress := "ws://host.docker.internal:8545"
+	wsAddress := "ws://127.0.0.1:8545"
 	if err := e2esuite.UpdateMulberryConfigRPC(localConfigPath, "Ethereum Sepolia", rpcAddress, wsAddress); err != nil {
 		log.Fatalf("Failed to update mulberry config: %v", err)
 	}
@@ -110,6 +113,14 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 }
 
 func (s *OutpostTestSuite) TestForge() {
+	// intercept SIGTERM (Ctrl + C)
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		cleanForgeSuite()
+	}()
+
 	ctx := context.Background()
 	s.SetupForgeSuite(ctx)
 
@@ -230,7 +241,7 @@ func (s *OutpostTestSuite) TestForge() {
 	if err != nil {
 		log.Fatalf("Failed to connect to the Ethereum ws client: %v", err)
 	}
-	defer client.Close()
+	defer wsClient.Close()
 
 	go eth.ListenToLogs(wsClient, common.HexToAddress(ContractAddress))
 
@@ -254,5 +265,14 @@ func (s *OutpostTestSuite) TestForge() {
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))
+
 	time.Sleep(10 * time.Hour) // if this is active vscode thinks test fails
+	logFile.Close()
+}
+
+func cleanForgeSuite() {
+	eth.ExecuteCommand("killall", []string{"anvil"})
+	e2esuite.StopContainer(containerID)
+	time.Sleep(10 * time.Second)
+	os.Exit(1)
 }

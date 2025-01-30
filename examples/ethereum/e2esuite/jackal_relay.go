@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"runtime"
 
@@ -14,6 +15,39 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 	"gopkg.in/yaml.v2"
 )
+
+// Function to force stop a container
+func StopContainer(containerID string) error {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return fmt.Errorf("failed to create Docker client: %w", err)
+	}
+
+	cli.ContainerStop(context.Background(), containerID, container.StopOptions{})
+	log.Printf("killed container %v", containerID)
+	return nil
+}
+
+// Function to stop all containers from an image
+func StopContainerByImage(imageName string) error {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return fmt.Errorf("failed to create Docker client: %w", err)
+	}
+
+	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{}) // all active containers
+	if err != nil {
+		return fmt.Errorf("failed to list Docker containers: %w", err)
+	}
+
+	for _, c := range containers {
+		if c.Image == imageName {
+			cli.ContainerStop(context.Background(), c.ID, container.StopOptions{})
+			log.Printf("killed container %v", c.ID)
+		}
+	}
+	return nil
+}
 
 // Utility for pulling and using an image of mulberry
 func PullMulberryImage(image string) error {

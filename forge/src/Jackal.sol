@@ -64,7 +64,7 @@ abstract contract Jackal {
         validAddress
         hasAllowance(from)
     {
-        uint256 pE = getStoragePrice(filesize, 2400); // 12 * 200 months
+        uint256 pE = 0; // getStoragePrice(filesize, 2400); // 12 * 200 months
         require(msg.value >= pE, string.concat("Insufficient payment, need ", Strings.toString(pE), " wei"));
         emit PostedFile(from, merkle, filesize, note);
     }
@@ -80,7 +80,7 @@ abstract contract Jackal {
         uint64 size_bytes,
         string memory referral
     ) public payable validAddress hasAllowance(from) {
-        uint256 pE = getStoragePrice(size_bytes, duration_days / 30); // months
+        uint256 pE = 0; // getStoragePrice(size_bytes, duration_days / 30); // months
         require(msg.value >= pE, string.concat("Insufficient payment, need ", Strings.toString(pE), " wei"));
         emit BoughtStorage(from, for_address, duration_days, size_bytes, referral);
     }

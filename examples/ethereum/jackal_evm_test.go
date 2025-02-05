@@ -202,8 +202,8 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	value := big.NewInt(5000000000000)
 
 	// Call `postFile` on the deployed JackalBridge contract
-	functionSig := "postFile(string,uint64,string)"
-	args := []string{merkleHex, filesize, ""}
+	functionSig := "postFile(string,uint64,string,uint64)"
+	args := []string{merkleHex, filesize, "", "30"}
 
 	txHash, err := ethWrapper.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA, value)
 	fmt.Printf("tx hash is: %s\n", txHash)

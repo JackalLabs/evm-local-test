@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 abstract contract Jackal {
-    event PostedFile(address sender, string merkle, uint64 size, string note);
+    event PostedFile(address sender, string merkle, uint64 size, string note, uint64 expires);
     event BoughtStorage(address from, string for_address, uint64 duration_days, uint64 size_bytes, string referral);
 
     function getPrice() public view virtual returns (int256);
@@ -58,19 +58,20 @@ abstract contract Jackal {
         return p;
     }
 
-    function postFileFrom(address from, string memory merkle, uint64 filesize, string memory note)
+    function postFileFrom(address from, string memory merkle, uint64 filesize, string memory note, uint64 expires)
         public
         payable
         validAddress
         hasAllowance(from)
     {
+        require(expires >= 30);
         uint256 pE = 0; // getStoragePrice(filesize, 2400); // 12 * 200 months
         require(msg.value >= pE, string.concat("Insufficient payment, need ", Strings.toString(pE), " wei"));
-        emit PostedFile(from, merkle, filesize, note);
+        emit PostedFile(from, merkle, filesize, note, expires);
     }
 
-    function postFile(string memory merkle, uint64 filesize, string memory note) public payable {
-        postFileFrom(msg.sender, merkle, filesize, note);
+    function postFile(string memory merkle, uint64 filesize, string memory note, uint64 expires) public payable {
+        postFileFrom(msg.sender, merkle, filesize, note, expires);
     }
 
     function buyStorageFrom(

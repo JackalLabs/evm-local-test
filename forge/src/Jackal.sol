@@ -4,8 +4,9 @@ pragma solidity ^0.8.0;
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 abstract contract Jackal {
-    event PostedFile(address sender, string merkle, uint64 size, string note, uint64 expires);
+    event PostedFile(address from, string merkle, uint64 size, string note, uint64 expires);
     event BoughtStorage(address from, string for_address, uint64 duration_days, uint64 size_bytes, string referral);
+    event DeletedFile(address from, string merkle, uint64 start);
 
     function getPrice() public view virtual returns (int256);
 
@@ -93,5 +94,19 @@ abstract contract Jackal {
         payable
     {
         buyStorageFrom(msg.sender, for_address, duration_days, size_bytes, referral);
+    }
+
+    function deleteFileFrom(address from, string memory merkle, uint64 start)
+        public
+        payable
+        validAddress
+        hasAllowance(from)
+    {
+        // is file deletion free?
+        emit DeletedFile(from, merkle, start);
+    }
+
+    function deleteFile(string memory merkle, uint64 start) public payable {
+        deleteFileFrom(msg.sender, merkle, start);
     }
 }

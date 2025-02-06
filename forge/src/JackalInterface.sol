@@ -16,4 +16,6 @@ interface JackalInterface {
         uint64 size_bytes,
         string memory referral
     ) external payable;
+    function deleteFile(string memory merkle, uint64 start) external payable;
+    function deleteFileFrom(address from, string memory merkle, uint64 start) external payable;
 }

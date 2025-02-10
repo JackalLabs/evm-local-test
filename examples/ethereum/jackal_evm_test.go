@@ -228,6 +228,15 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	fmt.Printf("tx hash: %s\n", txHash)
 	time.Sleep(10 * time.Second)
 
+	// Call `requestReportForm` on deployed JackalBridge contract
+	args = []string{"prover", merkleHex, "jkl12g4qwenvpzqeakavx5adqkw203s629tf6k8vdg", "1"}
+	txHash, err = ethWrapper.CastSend(ContractAddress, "requestReportForm(string,string,string,uint64)", args, rpcURL, privateKeyA, value)
+	if err != nil {
+		log.Fatalf("Call `requestReportForm` failed on contract: %v", err)
+	}
+	fmt.Printf("tx hash: %s\n", txHash)
+	time.Sleep(10 * time.Second)
+
 	/*
 		// Call `postFile` on the deployed JackalBridge contract
 		args = []string{merkleHex, filesize, "", "0"} // use existing storage plan

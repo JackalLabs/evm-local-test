@@ -8,6 +8,7 @@ abstract contract Jackal {
     event BoughtStorage(address from, string for_address, uint64 duration_days, uint64 size_bytes, string referral);
     event DeletedFile(address from, string merkle, uint64 start);
     event RequestedReportForm(address from, string prover, string merkle, string owner, uint64 start);
+    event PostedKey(address from, string key);
 
     function getPrice() public view virtual returns (int256);
 
@@ -126,5 +127,13 @@ abstract contract Jackal {
         payable
     {
         requestReportFormFrom(msg.sender, prover, merkle, owner, start);
+    }
+
+    function postKeyFrom(address from, string memory key) public payable validAddress hasAllowance(from) {
+        emit PostedKey(from, key);
+    }
+
+    function postKey(string memory key) public payable {
+        postKeyFrom(msg.sender, key);
     }
 }

@@ -99,16 +99,11 @@ abstract contract Jackal {
         buyStorageFrom(msg.sender, for_address, duration_days, size_bytes, referral);
     }
 
-    function deleteFileFrom(address from, string memory merkle, uint64 start)
-        public
-        payable
-        validAddress
-        hasAllowance(from)
-    {
+    function deleteFileFrom(address from, string memory merkle, uint64 start) public validAddress hasAllowance(from) {
         emit DeletedFile(from, merkle, start); // file deletion is free
     }
 
-    function deleteFile(string memory merkle, uint64 start) public payable {
+    function deleteFile(string memory merkle, uint64 start) public {
         deleteFileFrom(msg.sender, merkle, start);
     }
 
@@ -118,35 +113,31 @@ abstract contract Jackal {
         string memory merkle,
         string memory owner,
         uint64 start
-    ) public payable validAddress hasAllowance(from) {
+    ) public validAddress hasAllowance(from) {
         emit RequestedReportForm(from, prover, merkle, owner, start);
     }
 
-    function requestReportForm(string memory prover, string memory merkle, string memory owner, uint64 start)
-        public
-        payable
-    {
+    function requestReportForm(string memory prover, string memory merkle, string memory owner, uint64 start) public {
         requestReportFormFrom(msg.sender, prover, merkle, owner, start);
     }
 
-    function postKeyFrom(address from, string memory key) public payable validAddress hasAllowance(from) {
+    function postKeyFrom(address from, string memory key) public validAddress hasAllowance(from) {
         emit PostedKey(from, key);
     }
 
-    function postKey(string memory key) public payable {
+    function postKey(string memory key) public {
         postKeyFrom(msg.sender, key);
     }
 
     function deleteFileTreeFrom(address from, string memory hash_path, string memory account)
         public
-        payable
         validAddress
         hasAllowance(from)
     {
         emit DeletedFileTree(from, hash_path, account);
     }
 
-    function deleteFileTree(string memory hash_path, string memory account) public payable {
+    function deleteFileTree(string memory hash_path, string memory account) public {
         deleteFileTreeFrom(msg.sender, hash_path, account);
     }
 }

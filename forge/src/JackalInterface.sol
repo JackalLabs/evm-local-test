@@ -30,4 +30,6 @@ interface JackalInterface {
         payable;
     function postKey(string memory key) external payable;
     function postKeyFrom(address from, string memory key) external payable;
+    function deleteFileTree(string memory hash_path, string memory account) external payable;
+    function deleteFileTreeFrom(address from, string memory hash_path, string memory account) external payable;
 }

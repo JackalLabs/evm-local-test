@@ -10,6 +10,7 @@ abstract contract Jackal {
     event RequestedReportForm(address from, string prover, string merkle, string owner, uint64 start);
     event PostedKey(address from, string key);
     event DeletedFileTree(address from, string hash_path, string account);
+    event ProvisionedFileTree(address from, string editors, string viewers, string tracking_number);
 
     function getPrice() public view virtual returns (int256);
 
@@ -139,5 +140,18 @@ abstract contract Jackal {
 
     function deleteFileTree(string memory hash_path, string memory account) public {
         deleteFileTreeFrom(msg.sender, hash_path, account);
+    }
+
+    function provisionFileTreeFrom(
+        address from,
+        string memory editors,
+        string memory viewers,
+        string memory tracking_number
+    ) public validAddress hasAllowance(from) {
+        emit ProvisionedFileTree(from, editors, viewers, tracking_number);
+    }
+
+    function provisionFileTree(string memory editors, string memory viewers, string memory tracking_number) public {
+        provisionFileTreeFrom(msg.sender, editors, viewers, tracking_number);
     }
 }

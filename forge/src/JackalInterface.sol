@@ -31,4 +31,11 @@ interface JackalInterface {
     function postKeyFrom(address from, string memory key) external;
     function deleteFileTree(string memory hash_path, string memory account) external;
     function deleteFileTreeFrom(address from, string memory hash_path, string memory account) external;
+    function provisionFileTree(string memory editors, string memory viewers, string memory tracking_number) external;
+    function provisionFileTreeFrom(
+        address from,
+        string memory editors,
+        string memory viewers,
+        string memory tracking_number
+    ) external;
 }

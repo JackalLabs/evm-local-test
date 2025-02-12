@@ -38,4 +38,23 @@ interface JackalInterface {
         string memory viewers,
         string memory tracking_number
     ) external;
+    function postFileTree(
+        string memory account,
+        string memory hash_parent,
+        string memory hash_child,
+        string memory contents,
+        string memory viewers,
+        string memory editors,
+        string memory tracking_number
+    ) external;
+    function postFileTreeFrom(
+        address from,
+        string memory account,
+        string memory hash_parent,
+        string memory hash_child,
+        string memory contents,
+        string memory viewers,
+        string memory editors,
+        string memory tracking_number
+    ) external;
 }

@@ -210,38 +210,39 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	}
 	logAndSleep(txHash)
 
-	// Call `buyStorage` on deployed JackalBridge contract
 	txHash, err = ethWrapper.CastSend(ContractAddress, "buyStorage(string,uint64,uint64,string)", []string{testJKLAddress, "30", "1073741824", "sample referral"}, rpcURL, privateKeyA, value)
 	if err != nil {
 		log.Fatalf("Call `buyStorage` failed on contract: %v", err)
 	}
 	logAndSleep(txHash)
 
-	// Call `deleteFile` on deployed JackalBridge contract
 	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteFile(string,uint64)", []string{merkleHex, "1"}, rpcURL, privateKeyA, zero)
 	if err != nil {
 		log.Fatalf("Call `deleteFile` failed on contract: %v", err)
 	}
 	logAndSleep(txHash)
 
-	// Call `requestReportForm` on deployed JackalBridge contract
 	txHash, err = ethWrapper.CastSend(ContractAddress, "requestReportForm(string,string,string,uint64)", []string{"prover", merkleHex, testJKLAddress, "1"}, rpcURL, privateKeyA, zero)
 	if err != nil {
 		log.Fatalf("Call `requestReportForm` failed on contract: %v", err)
 	}
 	logAndSleep(txHash)
 
-	// Call `postKey` on deployed JackalBridge contract
 	txHash, err = ethWrapper.CastSend(ContractAddress, "postKey(string)", []string{"test key"}, rpcURL, privateKeyA, zero)
 	if err != nil {
 		log.Fatalf("Call `postKey` failed on contract: %v", err)
 	}
 	logAndSleep(txHash)
 
-	// Call `deleteFileTree` on deployed JackalBridge contract
-	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteFileTree(string,string)", []string{"account", "test/path"}, rpcURL, privateKeyA, zero)
+	txHash, err = ethWrapper.CastSend(ContractAddress, "provisionFileTree(string,string,string)", []string{"{}", "{}", "tracking123"}, rpcURL, privateKeyA, zero)
 	if err != nil {
-		log.Fatalf("Call `deleteFileTree` failed on contract: %v", err)
+		log.Fatalf("Call `provisionFileTree` failed on contract: %v", err)
+	}
+	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteFileTree(string,string)", []string{"test/path", "account"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `deleteFileTree` failed on contract: %v", err) // should fail until postFileTree is implemented
 	}
 	logAndSleep(txHash)
 

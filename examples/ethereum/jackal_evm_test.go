@@ -240,10 +240,15 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	}
 	logAndSleep(txHash)
 
+	txHash, err = ethWrapper.CastSend(ContractAddress, "postFileTree(string,string,string,string,string,string,string)", []string{"account", "parent hash", "child hash", "contents", "{}", "{}", "tracking123"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `postFileTree` failed on contract: %v", err) // should fail for nonexistent parent
+	}
+	logAndSleep(txHash)
+
 	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteFileTree(string,string)", []string{"test/path", "account"}, rpcURL, privateKeyA, zero)
 	if err != nil {
-		log.Fatalf("Call `deleteFileTree` failed on contract: %v", err) // should fail until postFileTree is implemented
-	}
+		log.Fatalf("Call `deleteFileTree` failed on contract: %v", err) // should fail for nonexistent file
 	logAndSleep(txHash)
 
 	/*

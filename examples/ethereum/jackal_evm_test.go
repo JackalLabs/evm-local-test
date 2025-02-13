@@ -242,25 +242,33 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "postFileTree(string,string,string,string,string,string,string)", []string{"account", "parent hash", "child hash", "contents", "{}", "{}", "tracking123"}, rpcURL, privateKeyA, zero)
 	if err != nil {
-		log.Fatalf("Call `postFileTree` failed on contract: %v", err) // should fail for nonexistent parent
+		log.Fatalf("Call `postFileTree` failed on contract: %v", err) // fails for parent does not exist
 	}
 	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteFileTree(string,string)", []string{"test/path", "account"}, rpcURL, privateKeyA, zero)
 	if err != nil {
-		log.Fatalf("Call `deleteFileTree` failed on contract: %v", err) // should fail for nonexistent file
+		log.Fatalf("Call `deleteFileTree` failed on contract: %v", err) // fails for file not found
+	}
 	logAndSleep(txHash)
 
-	/*
-		// Call `postFile` on the deployed JackalBridge contract
-		args = []string{merkleHex, filesize, "", "0"} // use existing storage plan
-		txHash, err = ethWrapper.CastSend(ContractAddress, "postFile(string,uint64,string,uint64)", args, rpcURL, privateKeyA, value)
-		if err != nil {
-			log.Fatalf("Failed to call `postFile` on the contract: %v", err)
-		}
-		fmt.Printf("tx hash: %s\n", txHash)
-		time.Sleep(10 * time.Second)
-	*/
+	txHash, err = ethWrapper.CastSend(ContractAddress, "addViewers(string,string,string,string)", []string{"viewer id", "viewer key", "for address", "file owner"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `addViewers` failed on contract: %v", err) // fails for file not found
+	}
+	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "removeViewers(string,string,string)", []string{"viewer id", "for address", "file owner"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `removeViewers` failed on contract: %v", err) // fails for file not found
+	}
+	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "resetViewers(string,string)", []string{"for address", "file owner"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `resetViewers` failed on contract: %v", err)
+	}
+	logAndSleep(txHash)
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")

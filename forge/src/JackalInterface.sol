@@ -57,4 +57,26 @@ interface JackalInterface {
         string memory editors,
         string memory tracking_number
     ) external;
+    function addViewers(
+        string memory viewer_ids,
+        string memory viewer_keys,
+        string memory for_address,
+        string memory file_owner
+    ) external;
+    function addViewersFrom(
+        address from,
+        string memory viewer_ids,
+        string memory viewer_keys,
+        string memory for_address,
+        string memory file_owner
+    ) external;
+    function removeViewers(string memory viewer_ids, string memory for_address, string memory file_owner) external;
+    function removeViewersFrom(
+        address from,
+        string memory viewer_ids,
+        string memory for_address,
+        string memory file_owner
+    ) external;
+    function resetViewers(string memory for_address, string memory file_owner) external;
+    function resetViewersFrom(address from, string memory for_address, string memory file_owner) external;
 }

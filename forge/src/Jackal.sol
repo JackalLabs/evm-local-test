@@ -21,6 +21,9 @@ abstract contract Jackal {
         string editors,
         string tracking_number
     );
+    event AddedViewers(address from, string viewer_ids, string viewer_keys, string for_address, string file_owner);
+    event RemovedViewers(address from, string viewer_ids, string for_address, string file_owner);
+    event ResetViewers(address from, string for_address, string file_owner);
 
     function getPrice() public view virtual returns (int256);
 
@@ -189,5 +192,49 @@ abstract contract Jackal {
         string memory tracking_number
     ) public {
         postFileTreeFrom(msg.sender, account, hash_parent, hash_child, contents, viewers, editors, tracking_number);
+    }
+
+    function addViewersFrom(
+        address from,
+        string memory viewer_ids,
+        string memory viewer_keys,
+        string memory for_address,
+        string memory file_owner
+    ) public validAddress hasAllowance(from) {
+        emit AddedViewers(from, viewer_ids, viewer_keys, for_address, file_owner);
+    }
+
+    function addViewers(
+        string memory viewer_ids,
+        string memory viewer_keys,
+        string memory for_address,
+        string memory file_owner
+    ) public {
+        addViewersFrom(msg.sender, viewer_ids, viewer_keys, for_address, file_owner);
+    }
+
+    function removeViewersFrom(
+        address from,
+        string memory viewer_ids,
+        string memory for_address,
+        string memory file_owner
+    ) public validAddress hasAllowance(from) {
+        emit RemovedViewers(from, viewer_ids, for_address, file_owner);
+    }
+
+    function removeViewers(string memory viewer_ids, string memory for_address, string memory file_owner) public {
+        removeViewersFrom(msg.sender, viewer_ids, for_address, file_owner);
+    }
+
+    function resetViewersFrom(address from, string memory for_address, string memory file_owner)
+        public
+        validAddress
+        hasAllowance(from)
+    {
+        emit ResetViewers(from, for_address, file_owner);
+    }
+
+    function resetViewers(string memory for_address, string memory file_owner) public {
+        resetViewersFrom(msg.sender, for_address, file_owner);
     }
 }

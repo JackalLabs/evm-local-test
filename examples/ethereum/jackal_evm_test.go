@@ -201,24 +201,52 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	// Given value
 	value := big.NewInt(5000000000000)
 
-	// Call `postFile` on the deployed JackalBridge contract
-	functionSig := "postFile(string,uint64)"
-	args := []string{merkleHex, filesize}
-
-	txHash, err := ethWrapper.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA, value)
-	fmt.Printf("tx hash is: %s\n", txHash)
+	// Call `postFile` on deployed JackalBridge contract
+	args := []string{merkleHex, filesize, "", "30"}
+	txHash, err := ethWrapper.CastSend(ContractAddress, "postFile(string,uint64,string,uint64)", args, rpcURL, privateKeyA, value)
 	if err != nil {
-		log.Fatalf("Failed to call `postFile` on the contract: %v", err)
+		log.Fatalf("Call `postFile` failed on contract: %v", err)
 	}
+	fmt.Printf("tx hash: %s\n", txHash)
+	time.Sleep(10 * time.Second)
 
-	time.Sleep(30 * time.Second)
-
-	// try again
-	txHash1, err := ethWrapper.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA, value)
-	fmt.Printf("tx hash is: %s\n", txHash1)
+	// Call `buyStorage` on deployed JackalBridge contract
+	args = []string{"jkl12g4qwenvpzqeakavx5adqkw203s629tf6k8vdg", "30", "1073741824", "sample referral"} // 1 gb-month
+	txHash, err = ethWrapper.CastSend(ContractAddress, "buyStorage(string,uint64,uint64,string)", args, rpcURL, privateKeyA, value)
 	if err != nil {
-		log.Fatalf("Failed to call `postFile` on the contract: %v", err)
+		log.Fatalf("Call `buyStorage` failed on contract: %v", err)
 	}
+	fmt.Printf("tx hash: %s\n", txHash)
+	time.Sleep(10 * time.Second)
+
+	// Call `deleteFile` on deployed JackalBridge contract
+	args = []string{merkleHex, "1"}
+	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteFile(string,uint64)", args, rpcURL, privateKeyA, value)
+	if err != nil {
+		log.Fatalf("Call `deleteFile` failed on contract: %v", err)
+	}
+	fmt.Printf("tx hash: %s\n", txHash)
+	time.Sleep(10 * time.Second)
+
+	// Call `requestReportForm` on deployed JackalBridge contract
+	args = []string{"prover", merkleHex, "jkl12g4qwenvpzqeakavx5adqkw203s629tf6k8vdg", "1"}
+	txHash, err = ethWrapper.CastSend(ContractAddress, "requestReportForm(string,string,string,uint64)", args, rpcURL, privateKeyA, value)
+	if err != nil {
+		log.Fatalf("Call `requestReportForm` failed on contract: %v", err)
+	}
+	fmt.Printf("tx hash: %s\n", txHash)
+	time.Sleep(10 * time.Second)
+
+	/*
+		// Call `postFile` on the deployed JackalBridge contract
+		args = []string{merkleHex, filesize, "", "0"} // use existing storage plan
+		txHash, err = ethWrapper.CastSend(ContractAddress, "postFile(string,uint64,string,uint64)", args, rpcURL, privateKeyA, value)
+		if err != nil {
+			log.Fatalf("Failed to call `postFile` on the contract: %v", err)
+		}
+		fmt.Printf("tx hash: %s\n", txHash)
+		time.Sleep(10 * time.Second)
+	*/
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")

@@ -79,4 +79,7 @@ interface JackalInterface {
     ) external;
     function resetViewers(string memory for_address, string memory file_owner) external;
     function resetViewersFrom(address from, string memory for_address, string memory file_owner) external;
+    function changeOwner(string memory for_address, string memory file_owner, string memory new_owner) external;
+    function changeOwnerFrom(address from, string memory for_address, string memory file_owner, string memory new_owner)
+        external;
 }

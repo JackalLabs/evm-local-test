@@ -280,6 +280,8 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))
+	eth.ExecuteCommand("killall", []string{"anvil"})
+	e2esuite.StopContainerByImage(image)
 }
 
 func logAndSleep(txHash string) error {

@@ -30,6 +30,7 @@ var (
 	localConfigPath  string
 	factoryAddress   string
 	logFile          *os.File
+	image            string
 )
 
 func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
@@ -114,7 +115,6 @@ func (s *OutpostTestSuite) SetupJackalEVMBridgeSuite(ctx context.Context) {
 	// Do we need a second Jackal User?
 
 	// setup Mulberry, pull image
-	var image string
 	switch runtime.GOARCH {
 	case "arm64":
 		image = "biphan4/mulberry:0.0.10"

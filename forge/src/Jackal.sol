@@ -8,6 +8,23 @@ abstract contract Jackal {
     event BoughtStorage(address from, string for_address, uint64 duration_days, uint64 size_bytes, string referral);
     event DeletedFile(address from, string merkle, uint64 start);
     event RequestedReportForm(address from, string prover, string merkle, string owner, uint64 start);
+    event PostedKey(address from, string key);
+    event DeletedFileTree(address from, string hash_path, string account);
+    event ProvisionedFileTree(address from, string editors, string viewers, string tracking_number);
+    event PostedFileTree(
+        address from,
+        string account,
+        string hash_parent,
+        string hash_child,
+        string contents,
+        string viewers,
+        string editors,
+        string tracking_number
+    );
+    event AddedViewers(address from, string viewer_ids, string viewer_keys, string for_address, string file_owner);
+    event RemovedViewers(address from, string viewer_ids, string for_address, string file_owner);
+    event ResetViewers(address from, string for_address, string file_owner);
+    event ChangedOwner(address from, string for_address, string file_owner, string new_owner);
 
     function getPrice() public view virtual returns (int256);
 
@@ -60,6 +77,10 @@ abstract contract Jackal {
         return p;
     }
 
+    function postFile(string memory merkle, uint64 filesize, string memory note, uint64 expires) public payable {
+        postFileFrom(msg.sender, merkle, filesize, note, expires);
+    }
+
     function postFileFrom(address from, string memory merkle, uint64 filesize, string memory note, uint64 expires)
         public
         payable
@@ -74,8 +95,11 @@ abstract contract Jackal {
         emit PostedFile(from, merkle, filesize, note, expires);
     }
 
-    function postFile(string memory merkle, uint64 filesize, string memory note, uint64 expires) public payable {
-        postFileFrom(msg.sender, merkle, filesize, note, expires);
+    function buyStorage(string memory for_address, uint64 duration_days, uint64 size_bytes, string memory referral)
+        public
+        payable
+    {
+        buyStorageFrom(msg.sender, for_address, duration_days, size_bytes, referral);
     }
 
     function buyStorageFrom(
@@ -90,25 +114,16 @@ abstract contract Jackal {
         emit BoughtStorage(from, for_address, duration_days, size_bytes, referral);
     }
 
-    function buyStorage(string memory for_address, uint64 duration_days, uint64 size_bytes, string memory referral)
-        public
-        payable
-    {
-        buyStorageFrom(msg.sender, for_address, duration_days, size_bytes, referral);
-    }
-
-    function deleteFileFrom(address from, string memory merkle, uint64 start)
-        public
-        payable
-        validAddress
-        hasAllowance(from)
-    {
-        // is file deletion free?
-        emit DeletedFile(from, merkle, start);
-    }
-
-    function deleteFile(string memory merkle, uint64 start) public payable {
+    function deleteFile(string memory merkle, uint64 start) public {
         deleteFileFrom(msg.sender, merkle, start);
+    }
+
+    function deleteFileFrom(address from, string memory merkle, uint64 start) public validAddress hasAllowance(from) {
+        emit DeletedFile(from, merkle, start); // file deletion is free
+    }
+
+    function requestReportForm(string memory prover, string memory merkle, string memory owner, uint64 start) public {
+        requestReportFormFrom(msg.sender, prover, merkle, owner, start);
     }
 
     function requestReportFormFrom(
@@ -117,14 +132,121 @@ abstract contract Jackal {
         string memory merkle,
         string memory owner,
         uint64 start
-    ) public payable validAddress hasAllowance(from) {
+    ) public validAddress hasAllowance(from) {
         emit RequestedReportForm(from, prover, merkle, owner, start);
     }
 
-    function requestReportForm(string memory prover, string memory merkle, string memory owner, uint64 start)
+    function postKey(string memory key) public {
+        postKeyFrom(msg.sender, key);
+    }
+
+    function postKeyFrom(address from, string memory key) public validAddress hasAllowance(from) {
+        emit PostedKey(from, key);
+    }
+
+    function deleteFileTree(string memory hash_path, string memory account) public {
+        deleteFileTreeFrom(msg.sender, hash_path, account);
+    }
+
+    function deleteFileTreeFrom(address from, string memory hash_path, string memory account)
         public
-        payable
+        validAddress
+        hasAllowance(from)
     {
-        requestReportFormFrom(msg.sender, prover, merkle, owner, start);
+        emit DeletedFileTree(from, hash_path, account);
+    }
+
+    function provisionFileTree(string memory editors, string memory viewers, string memory tracking_number) public {
+        provisionFileTreeFrom(msg.sender, editors, viewers, tracking_number);
+    }
+
+    function provisionFileTreeFrom(
+        address from,
+        string memory editors,
+        string memory viewers,
+        string memory tracking_number
+    ) public validAddress hasAllowance(from) {
+        emit ProvisionedFileTree(from, editors, viewers, tracking_number);
+    }
+
+    function postFileTree(
+        string memory account,
+        string memory hash_parent,
+        string memory hash_child,
+        string memory contents,
+        string memory viewers,
+        string memory editors,
+        string memory tracking_number
+    ) public {
+        postFileTreeFrom(msg.sender, account, hash_parent, hash_child, contents, viewers, editors, tracking_number);
+    }
+
+    function postFileTreeFrom(
+        address from,
+        string memory account,
+        string memory hash_parent,
+        string memory hash_child,
+        string memory contents,
+        string memory viewers,
+        string memory editors,
+        string memory tracking_number
+    ) public validAddress hasAllowance(from) {
+        emit PostedFileTree(from, account, hash_parent, hash_child, contents, viewers, editors, tracking_number);
+    }
+
+    function addViewers(
+        string memory viewer_ids,
+        string memory viewer_keys,
+        string memory for_address,
+        string memory file_owner
+    ) public {
+        addViewersFrom(msg.sender, viewer_ids, viewer_keys, for_address, file_owner);
+    }
+
+    function addViewersFrom(
+        address from,
+        string memory viewer_ids,
+        string memory viewer_keys,
+        string memory for_address,
+        string memory file_owner
+    ) public validAddress hasAllowance(from) {
+        emit AddedViewers(from, viewer_ids, viewer_keys, for_address, file_owner);
+    }
+
+    function removeViewers(string memory viewer_ids, string memory for_address, string memory file_owner) public {
+        removeViewersFrom(msg.sender, viewer_ids, for_address, file_owner);
+    }
+
+    function removeViewersFrom(
+        address from,
+        string memory viewer_ids,
+        string memory for_address,
+        string memory file_owner
+    ) public validAddress hasAllowance(from) {
+        emit RemovedViewers(from, viewer_ids, for_address, file_owner);
+    }
+
+    function resetViewers(string memory for_address, string memory file_owner) public {
+        resetViewersFrom(msg.sender, for_address, file_owner);
+    }
+
+    function resetViewersFrom(address from, string memory for_address, string memory file_owner)
+        public
+        validAddress
+        hasAllowance(from)
+    {
+        emit ResetViewers(from, for_address, file_owner);
+    }
+
+    function changeOwner(string memory for_address, string memory file_owner, string memory new_owner) public {
+        changeOwnerFrom(msg.sender, for_address, file_owner, new_owner);
+    }
+
+    function changeOwnerFrom(address from, string memory for_address, string memory file_owner, string memory new_owner)
+        public
+        validAddress
+        hasAllowance(from)
+    {
+        emit ChangedOwner(from, for_address, file_owner, new_owner);
     }
 }

@@ -168,6 +168,7 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	ContractAddress = returnedContractAddr
 	fmt.Printf("JackalBridge deployed at: %s\n", ContractAddress)
+	testJKLAddress := "jkl12g4qwenvpzqeakavx5adqkw203s629tf6k8vdg"
 
 	// NOTE: The name of the network shouldn't matter when trying to establish a connection
 	// WARNING: double check finality. I think it's 2 but double check
@@ -200,56 +201,91 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	// Given value
 	value := big.NewInt(5000000000000)
+	zero := big.NewInt(0)
 
-	// Call `postFile` on deployed JackalBridge contract
-	args := []string{merkleHex, filesize, "", "30"}
-	txHash, err := ethWrapper.CastSend(ContractAddress, "postFile(string,uint64,string,uint64)", args, rpcURL, privateKeyA, value)
+	// the below calls test evm <-> mulberry <-> cosmwasm <-> canine
+
+	txHash, err := ethWrapper.CastSend(ContractAddress, "postFile(string,uint64,string,uint64)", []string{merkleHex, filesize, "", "30"}, rpcURL, privateKeyA, value)
 	if err != nil {
 		log.Fatalf("Call `postFile` failed on contract: %v", err)
 	}
-	fmt.Printf("tx hash: %s\n", txHash)
-	time.Sleep(10 * time.Second)
+	logAndSleep(txHash)
 
-	// Call `buyStorage` on deployed JackalBridge contract
-	args = []string{"jkl12g4qwenvpzqeakavx5adqkw203s629tf6k8vdg", "30", "1073741824", "sample referral"} // 1 gb-month
-	txHash, err = ethWrapper.CastSend(ContractAddress, "buyStorage(string,uint64,uint64,string)", args, rpcURL, privateKeyA, value)
+	txHash, err = ethWrapper.CastSend(ContractAddress, "buyStorage(string,uint64,uint64,string)", []string{testJKLAddress, "30", "1073741824", "sample referral"}, rpcURL, privateKeyA, value)
 	if err != nil {
 		log.Fatalf("Call `buyStorage` failed on contract: %v", err)
 	}
-	fmt.Printf("tx hash: %s\n", txHash)
-	time.Sleep(10 * time.Second)
+	logAndSleep(txHash)
 
-	// Call `deleteFile` on deployed JackalBridge contract
-	args = []string{merkleHex, "1"}
-	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteFile(string,uint64)", args, rpcURL, privateKeyA, value)
+	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteFile(string,uint64)", []string{merkleHex, "1"}, rpcURL, privateKeyA, zero)
 	if err != nil {
 		log.Fatalf("Call `deleteFile` failed on contract: %v", err)
 	}
-	fmt.Printf("tx hash: %s\n", txHash)
-	time.Sleep(10 * time.Second)
+	logAndSleep(txHash)
 
-	// Call `requestReportForm` on deployed JackalBridge contract
-	args = []string{"prover", merkleHex, "jkl12g4qwenvpzqeakavx5adqkw203s629tf6k8vdg", "1"}
-	txHash, err = ethWrapper.CastSend(ContractAddress, "requestReportForm(string,string,string,uint64)", args, rpcURL, privateKeyA, value)
+	txHash, err = ethWrapper.CastSend(ContractAddress, "requestReportForm(string,string,string,uint64)", []string{"prover", merkleHex, testJKLAddress, "1"}, rpcURL, privateKeyA, zero)
 	if err != nil {
 		log.Fatalf("Call `requestReportForm` failed on contract: %v", err)
 	}
-	fmt.Printf("tx hash: %s\n", txHash)
-	time.Sleep(10 * time.Second)
+	logAndSleep(txHash)
 
-	/*
-		// Call `postFile` on the deployed JackalBridge contract
-		args = []string{merkleHex, filesize, "", "0"} // use existing storage plan
-		txHash, err = ethWrapper.CastSend(ContractAddress, "postFile(string,uint64,string,uint64)", args, rpcURL, privateKeyA, value)
-		if err != nil {
-			log.Fatalf("Failed to call `postFile` on the contract: %v", err)
-		}
-		fmt.Printf("tx hash: %s\n", txHash)
-		time.Sleep(10 * time.Second)
-	*/
+	txHash, err = ethWrapper.CastSend(ContractAddress, "postKey(string)", []string{"test key"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `postKey` failed on contract: %v", err)
+	}
+	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "provisionFileTree(string,string,string)", []string{"{}", "{}", "tracking123"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `provisionFileTree` failed on contract: %v", err)
+	}
+	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "postFileTree(string,string,string,string,string,string,string)", []string{"account", "parent hash", "child hash", "contents", "{}", "{}", "tracking123"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `postFileTree` failed on contract: %v", err) // fails for parent does not exist
+	}
+	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteFileTree(string,string)", []string{"test/path", "account"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `deleteFileTree` failed on contract: %v", err) // fails for file not found
+	}
+	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "addViewers(string,string,string,string)", []string{"viewer id", "viewer key", "for address", "file owner"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `addViewers` failed on contract: %v", err) // fails for file not found
+	}
+	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "removeViewers(string,string,string)", []string{"viewer id", "for address", "file owner"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `removeViewers` failed on contract: %v", err) // fails for file not found
+	}
+	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "resetViewers(string,string)", []string{"for address", "file owner"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `resetViewers` failed on contract: %v", err) // fails for file not found
+	}
+	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "changeOwner(string,string,string)", []string{"for address", "old owner", "new owner"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `changeOwner` failed on contract: %v", err) // fails for file not found
+	}
+	logAndSleep(txHash)
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))
-	time.Sleep(10 * time.Hour) // if this is active vscode thinks test fails
+	eth.ExecuteCommand("killall", []string{"anvil"})
+	e2esuite.StopContainerByImage(image)
+}
+
+func logAndSleep(txHash string) error {
+	fmt.Printf("tx hash: %s\n", txHash)
+	time.Sleep(10 * time.Second)
+	return nil
 }

@@ -203,7 +203,8 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	value := big.NewInt(5000000000000)
 	zero := big.NewInt(0)
 
-	// Call `postFile` on deployed JackalBridge contract
+	// the below calls test evm <-> mulberry <-> cosmwasm <-> canine
+
 	txHash, err := ethWrapper.CastSend(ContractAddress, "postFile(string,uint64,string,uint64)", []string{merkleHex, filesize, "", "30"}, rpcURL, privateKeyA, value)
 	if err != nil {
 		log.Fatalf("Call `postFile` failed on contract: %v", err)
@@ -266,14 +267,19 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "resetViewers(string,string)", []string{"for address", "file owner"}, rpcURL, privateKeyA, zero)
 	if err != nil {
-		log.Fatalf("Call `resetViewers` failed on contract: %v", err)
+		log.Fatalf("Call `resetViewers` failed on contract: %v", err) // fails for file not found
+	}
+	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "changeOwner(string,string,string)", []string{"for address", "old owner", "new owner"}, rpcURL, privateKeyA, zero)
+	if err != nil {
+		log.Fatalf("Call `changeOwner` failed on contract: %v", err) // fails for file not found
 	}
 	logAndSleep(txHash)
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))
-	time.Sleep(10 * time.Hour) // if this is active vscode thinks test fails
 }
 
 func logAndSleep(txHash string) error {

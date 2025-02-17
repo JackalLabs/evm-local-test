@@ -25,6 +25,9 @@ abstract contract Jackal {
     event RemovedViewers(address from, string viewer_ids, string for_address, string file_owner);
     event ResetViewers(address from, string for_address, string file_owner);
     event ChangedOwner(address from, string for_address, string file_owner, string new_owner);
+    event AddedEditors(address from, string editor_ids, string editor_keys, string for_address, string file_owner);
+    event RemovedEditors(address from, string editor_ids, string for_address, string file_owner);
+    event ResetEditors(address from, string for_address, string file_owner);
 
     function getPrice() public view virtual returns (int256);
 
@@ -248,5 +251,49 @@ abstract contract Jackal {
         hasAllowance(from)
     {
         emit ChangedOwner(from, for_address, file_owner, new_owner);
+    }
+
+    function addEditors(
+        string memory editor_ids,
+        string memory editor_keys,
+        string memory for_address,
+        string memory file_owner
+    ) public {
+        addEditorsFrom(msg.sender, editor_ids, editor_keys, for_address, file_owner);
+    }
+
+    function addEditorsFrom(
+        address from,
+        string memory editor_ids,
+        string memory editor_keys,
+        string memory for_address,
+        string memory file_owner
+    ) public validAddress hasAllowance(from) {
+        emit AddedEditors(from, editor_ids, editor_keys, for_address, file_owner);
+    }
+
+    function removeEditors(string memory editor_ids, string memory for_address, string memory file_owner) public {
+        removeEditorsFrom(msg.sender, editor_ids, for_address, file_owner);
+    }
+
+    function removeEditorsFrom(
+        address from,
+        string memory editor_ids,
+        string memory for_address,
+        string memory file_owner
+    ) public validAddress hasAllowance(from) {
+        emit RemovedEditors(from, editor_ids, for_address, file_owner);
+    }
+
+    function resetEditors(string memory for_address, string memory file_owner) public {
+        resetEditorsFrom(msg.sender, for_address, file_owner);
+    }
+
+    function resetEditorsFrom(address from, string memory for_address, string memory file_owner)
+        public
+        validAddress
+        hasAllowance(from)
+    {
+        emit ResetEditors(from, for_address, file_owner);
     }
 }

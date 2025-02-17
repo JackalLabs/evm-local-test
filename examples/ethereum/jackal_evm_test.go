@@ -206,76 +206,79 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	// the below calls test evm <-> mulberry <-> cosmwasm <-> canine
 
 	txHash, err := ethWrapper.CastSend(ContractAddress, "postFile(string,uint64,string,uint64)", []string{merkleHex, filesize, "", "30"}, rpcURL, privateKeyA, value)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `postFile` failed on contract: %v", err)
 	}
-	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "buyStorage(string,uint64,uint64,string)", []string{testJKLAddress, "30", "1073741824", "sample referral"}, rpcURL, privateKeyA, value)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `buyStorage` failed on contract: %v", err)
 	}
-	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteFile(string,uint64)", []string{merkleHex, "1"}, rpcURL, privateKeyA, zero)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `deleteFile` failed on contract: %v", err)
 	}
-	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "requestReportForm(string,string,string,uint64)", []string{"prover", merkleHex, testJKLAddress, "1"}, rpcURL, privateKeyA, zero)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `requestReportForm` failed on contract: %v", err)
 	}
-	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "postKey(string)", []string{"test key"}, rpcURL, privateKeyA, zero)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `postKey` failed on contract: %v", err)
 	}
-	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "provisionFileTree(string,string,string)", []string{"{}", "{}", "tracking123"}, rpcURL, privateKeyA, zero)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `provisionFileTree` failed on contract: %v", err)
 	}
-	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "postFileTree(string,string,string,string,string,string,string)", []string{"account", "parent hash", "child hash", "contents", "{}", "{}", "tracking123"}, rpcURL, privateKeyA, zero)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `postFileTree` failed on contract: %v", err) // fails for parent does not exist
 	}
-	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteFileTree(string,string)", []string{"test/path", "account"}, rpcURL, privateKeyA, zero)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `deleteFileTree` failed on contract: %v", err) // fails for file not found
 	}
-	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "addViewers(string,string,string,string)", []string{"viewer id", "viewer key", "for address", "file owner"}, rpcURL, privateKeyA, zero)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `addViewers` failed on contract: %v", err) // fails for file not found
 	}
-	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "removeViewers(string,string,string)", []string{"viewer id", "for address", "file owner"}, rpcURL, privateKeyA, zero)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `removeViewers` failed on contract: %v", err) // fails for file not found
 	}
-	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "resetViewers(string,string)", []string{"for address", "file owner"}, rpcURL, privateKeyA, zero)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `resetViewers` failed on contract: %v", err) // fails for file not found
 	}
-	logAndSleep(txHash)
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "changeOwner(string,string,string)", []string{"for address", "old owner", "new owner"}, rpcURL, privateKeyA, zero)
-	if err != nil {
+	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `changeOwner` failed on contract: %v", err) // fails for file not found
 	}
-	logAndSleep(txHash)
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "addEditors(string,string,string,string)", []string{"editor id", "editor key", "for address", "file owner"}, rpcURL, privateKeyA, zero)
+	if logAndSleep(txHash); err != nil {
+		log.Fatalf("Call `addEditors` failed on contract: %v", err) // fails for file not found
+	}
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "removeEditors(string,string,string)", []string{"editor id", "for address", "file owner"}, rpcURL, privateKeyA, zero)
+	if logAndSleep(txHash); err != nil {
+		log.Fatalf("Call `removeEditors` failed on contract: %v", err) // fails for file not found
+	}
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "resetEditors(string,string)", []string{"for address", "file owner"}, rpcURL, privateKeyA, zero)
+	if logAndSleep(txHash); err != nil {
+		log.Fatalf("Call `resetEditors` failed on contract: %v", err) // fails for file not found
+	}
 
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")

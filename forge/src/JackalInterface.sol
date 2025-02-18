@@ -113,4 +113,6 @@ interface JackalInterface {
     ) external;
     function deleteNotification(string memory notification_from, uint64 time) external;
     function deleteNotificationFrom(address from, string memory notification_from, uint64 time) external;
+    function blockSenders(string[] memory to_block) external;
+    function blockSendersFrom(address from, string[] memory to_block) external;
 }

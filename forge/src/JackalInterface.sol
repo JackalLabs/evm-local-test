@@ -82,4 +82,26 @@ interface JackalInterface {
     function changeOwner(string memory for_address, string memory file_owner, string memory new_owner) external;
     function changeOwnerFrom(address from, string memory for_address, string memory file_owner, string memory new_owner)
         external;
+    function addEditors(
+        string memory editor_ids,
+        string memory editor_keys,
+        string memory for_address,
+        string memory file_owner
+    ) external;
+    function addEditorsFrom(
+        address from,
+        string memory editor_ids,
+        string memory editor_keys,
+        string memory for_address,
+        string memory file_owner
+    ) external;
+    function removeEditors(string memory editor_ids, string memory for_address, string memory file_owner) external;
+    function removeEditorsFrom(
+        address from,
+        string memory editor_ids,
+        string memory for_address,
+        string memory file_owner
+    ) external;
+    function resetEditors(string memory for_address, string memory file_owner) external;
+    function resetEditorsFrom(address from, string memory for_address, string memory file_owner) external;
 }

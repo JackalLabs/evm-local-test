@@ -104,4 +104,13 @@ interface JackalInterface {
     ) external;
     function resetEditors(string memory for_address, string memory file_owner) external;
     function resetEditorsFrom(address from, string memory for_address, string memory file_owner) external;
+    function createNotification(string memory to, string memory contents, string memory private_contents) external;
+    function createNotificationFrom(
+        address from,
+        string memory to,
+        string memory contents,
+        string memory private_contents
+    ) external;
+    function deleteNotification(string memory notification_from, uint64 time) external;
+    function deleteNotificationFrom(address from, string memory notification_from, uint64 time) external;
 }

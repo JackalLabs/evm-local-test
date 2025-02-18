@@ -28,6 +28,8 @@ abstract contract Jackal {
     event AddedEditors(address from, string editor_ids, string editor_keys, string for_address, string file_owner);
     event RemovedEditors(address from, string editor_ids, string for_address, string file_owner);
     event ResetEditors(address from, string for_address, string file_owner);
+    event CreatedNotification(address from, string to, string contents, string private_contents);
+    event DeletedNotification(address from, string notification_from, uint64 time);
 
     function getPrice() public view virtual returns (int256);
 
@@ -295,5 +297,30 @@ abstract contract Jackal {
         hasAllowance(from)
     {
         emit ResetEditors(from, for_address, file_owner);
+    }
+
+    function createNotification(string memory to, string memory contents, string memory private_contents) public {
+        createNotificationFrom(msg.sender, to, contents, private_contents);
+    }
+
+    function createNotificationFrom(
+        address from,
+        string memory to,
+        string memory contents,
+        string memory private_contents
+    ) public validAddress hasAllowance(from) {
+        emit CreatedNotification(from, to, contents, private_contents);
+    }
+
+    function deleteNotification(string memory notification_from, uint64 time) public {
+        deleteNotificationFrom(msg.sender, notification_from, time);
+    }
+
+    function deleteNotificationFrom(address from, string memory notification_from, uint64 time)
+        public
+        validAddress
+        hasAllowance(from)
+    {
+        emit DeletedNotification(from, notification_from, time);
     }
 }

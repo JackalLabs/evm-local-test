@@ -291,6 +291,11 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 		log.Fatalf("Call `deleteNotification` failed on contract: %v", err)
 	}
 
+	txHash, err = ethWrapper.CastSend(ContractAddress, "blockSenders(string[])", []string{`["` + testJKLAddress + `"]`}, rpcURL, privateKeyA, zero) // can also block registered .jkl names
+	if logAndSleep(txHash); err != nil {
+		log.Fatalf("Call `blockSenders` failed on contract: %v", err)
+	}
+
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -278,6 +279,16 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	txHash, err = ethWrapper.CastSend(ContractAddress, "resetEditors(string,string)", []string{"for address", "file owner"}, rpcURL, privateKeyA, zero)
 	if logAndSleep(txHash); err != nil {
 		log.Fatalf("Call `resetEditors` failed on contract: %v", err) // fails for file not found
+	}
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "createNotification(string,string,string)", []string{testJKLAddress, `{"key": "value"}`, base64.StdEncoding.EncodeToString([]byte("encrypted contents"))}, rpcURL, privateKeyA, zero)
+	if logAndSleep(txHash); err != nil {
+		log.Fatalf("Call `createNotification` failed on contract: %v", err)
+	}
+
+	txHash, err = ethWrapper.CastSend(ContractAddress, "deleteNotification(string,uint64)", []string{testJKLAddress, "60"}, rpcURL, privateKeyA, zero)
+	if logAndSleep(txHash); err != nil {
+		log.Fatalf("Call `deleteNotification` failed on contract: %v", err)
 	}
 
 	s.Require().True(s.Run("forge", func() {

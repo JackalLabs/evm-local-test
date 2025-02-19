@@ -62,6 +62,7 @@ abstract contract Jackal {
     }
 
     function getStoragePrice(uint64 filesize, uint256 months) public view returns (uint256) {
+        // requires chainlink oracle, will not work on localnet
         uint256 price = uint256(getPrice());
         uint256 storagePrice = 15; // price at 8 decimal places
         uint256 multiplier = 2;

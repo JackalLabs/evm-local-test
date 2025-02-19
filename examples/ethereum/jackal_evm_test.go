@@ -25,7 +25,7 @@ var EvmUserA string
 
 func (s *OutpostTestSuite) TestJackalEVMBridge() {
 	ctx := context.Background()
-	s.SetupJackalEVMBridgeSuite(ctx)
+	s.SetupMulberrySuite(ctx, "jackal_evm_log.txt")
 	defer logFile.Close()
 
 	// Fund jackal account
@@ -96,8 +96,7 @@ func (s *OutpostTestSuite) TestJackalEVMBridge() {
 
 	fundingRes, _ := s.ChainB.ExecuteContract(ctx, s.UserB.KeyName(), factoryAddress, factoryFundingExecuteMsg.ToString(), "--gas", "500000")
 	fmt.Println(fundingRes)
-
-	time.Sleep(30 * time.Second)
+	time.Sleep(10 * time.Second)
 
 	// Check Account A's nonce
 	nonce, err := client.PendingNonceAt(context.Background(), addressA)

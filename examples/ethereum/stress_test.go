@@ -153,13 +153,16 @@ func (s *OutpostTestSuite) TestStress() {
 	// Given value
 	value := big.NewInt(5000000000000)
 	zero := big.NewInt(0)
+	var txHash string
 
 	// the below calls test evm <-> mulberry <-> cosmwasm <-> canine
-
-	txHash, err := ethWrapper.CastSend(ContractAddress, "postFile(string,uint64,string,uint64)", []string{merkleHex, filesize, "", "30"}, rpcURL, privateKeyA, value)
-	if log.Println(txHash); err != nil {
-		log.Fatalf("Call `postFile` failed on contract: %v", err)
+	for i := 0; i < 100; i++ {
+		txHash, err = ethWrapper.CastSend(ContractAddress, "postFile(string,uint64,string,uint64)", []string{merkleHex, filesize, "", "30"}, rpcURL, privateKeyA, value)
+		if log.Println(txHash); err != nil {
+			log.Fatalf("Call `postFile` failed on contract: %v", err)
+		}
 	}
+	log.Println("100 `postFile` calls complete")
 
 	txHash, err = ethWrapper.CastSend(ContractAddress, "buyStorage(string,uint64,uint64,string)", []string{testJKLAddress, "30", "1073741824", "sample referral"}, rpcURL, privateKeyA, value)
 	if log.Println(txHash); err != nil {

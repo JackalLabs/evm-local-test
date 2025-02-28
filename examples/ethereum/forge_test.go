@@ -77,7 +77,7 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 		log.Fatalf("Error running container: %v", err)
 	}
 
-	logFile, err = os.Create("mulberry_logs.txt")
+	logFile, err = os.Create("forge_log.txt")
 	if err != nil {
 		log.Fatalf("Failed to create log file: %v", err)
 	}
@@ -253,8 +253,8 @@ func (s *OutpostTestSuite) TestForge() {
 	value := big.NewInt(5000000000000)
 
 	// Call `postFile` on the deployed JackalBridge contract
-	functionSig := "postFile(string,uint64)"
-	args := []string{merkle, filesize}
+	functionSig := "postFile(string,uint64,string,uint64)"
+	args := []string{merkle, filesize, "", "30"}
 
 	txHash, err := ethWrapper.CastSend(ContractAddress, functionSig, args, rpcURL, privateKeyA, value)
 	fmt.Printf("tx hash is: %s\n", txHash)
@@ -265,9 +265,7 @@ func (s *OutpostTestSuite) TestForge() {
 	s.Require().True(s.Run("forge", func() {
 		fmt.Println("made it to the end")
 	}))
-
-	time.Sleep(10 * time.Hour) // if this is active vscode thinks test fails
-	logFile.Close()
+	time.Sleep(10 * time.Second)
 }
 
 func cleanForgeSuite() {

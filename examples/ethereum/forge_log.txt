@@ -1,10 +1,11 @@
-You have just generated a new seed phrase for this relay at /root/.mulberry/seed.jsonWallet Address: jkl1ad32cr6avguc6dn4zxz4pzvpkhkvqxs6czd3gq
-2025/02/28 20:23:07 Starting relay...
-8:23PM DBG ../app/relay/eth.go:20 > Now listening to Ethereum Sepolia...
-8:23PM DBG ../app/jackal/uploader/queue.go:128 > updating gecko...
-8:23PM DBG ../app/relay/eth.go:68 > Ready to listen!
-8:23PM DBG ../app/relay/eth.go:90 > Log received: 0x5FbDB2315678afecb367f032d93F642f64180aa3
-8:23PM DBG ../app/relay/eth.go:90 > Log received: 0x5FbDB2315678afecb367f032d93F642f64180aa3
-2025/02/28 20:23:12 Event details: {From:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 Merkle:placeholder-merkle-root Size:1048576 Note: Expires:30}
-2025/02/28 20:23:12 Failed to decode merkle: encoding/hex: invalid byte: U+0070 'p'
-2025/02/28 20:23:12 Failed to unpack event 0xb69a3158e99a25f2374c54d049cb4061b88a17de1583f916a96053268217a346: <nil> encoding/hex: invalid byte: U+0070 'p'
+You have just generated a new seed phrase for this relay at /root/.mulberry/seed.jsonWallet Address: jkl1xj7kvr3xnjqwxwawzcfu4ugau8ttj3lq62ez0k
+2025/03/11 15:41:12 Starting relay...
+3:41PM DBG ../app/relay/eth.go:22 > Connecting to Ethereum Sepolia network="Ethereum Sepolia"
+3:41PM DBG ../app/jackal/uploader/queue.go:128 > updating gecko...
+3:41PM DBG ../app/relay/eth.go:72 > Ready to listen on Ethereum Sepolia network="Ethereum Sepolia"
+3:41PM DBG ../app/jackal/uploader/queue.go:142 > updated gecko with 0.121360
+3:41PM DBG ../app/relay/eth.go:94 > Log received: 0x5FbDB2315678afecb367f032d93F642f64180aa3 network="Ethereum Sepolia"
+3:41PM DBG ../app/relay/eth.go:94 > Log received: 0x5FbDB2315678afecb367f032d93F642f64180aa3 network="Ethereum Sepolia"
+2025/03/11 15:41:17 Event details: {From:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 Merkle:placeholder-merkle-root Size:1048576 Note: Expires:30}
+2025/03/11 15:41:17 Failed to decode merkle: encoding/hex: invalid byte: U+0070 'p'
+2025/03/11 15:41:17 Failed to unpack event 0xb69a3158e99a25f2374c54d049cb4061b88a17de1583f916a96053268217a346: <nil> encoding/hex: invalid byte: U+0070 'p'

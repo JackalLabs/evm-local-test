@@ -14,7 +14,7 @@ require (
 	github.com/cometbft/cometbft v0.37.5
 	github.com/cosmos/cosmos-sdk v0.47.13
 	github.com/cosmos/go-bip39 v1.0.0
-	github.com/cosmos/gogoproto v1.4.10
+	github.com/cosmos/gogoproto v1.7.0
 	github.com/cosmos/ibc-go/v7 v7.9.2
 	github.com/cosmos/interchain-security/v3 v3.1.1-0.20231102122221-81650a84f989
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc

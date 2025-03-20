@@ -35,15 +35,16 @@ abstract contract Jackal {
     struct JackalMessage {
         string id;
         address sender;
-        uint height;
+        uint256 height;
         uint256 value;
     }
 
     JackalMessage[] public messages;
 
-    function newMessage(address sender, string memory messageType) private returns (string memory){
-        uint height = block.number;
+    function newMessage(address sender, string memory messageType) private returns (string memory) {
+        uint256 height = block.number;
 
+        // concat messageType and address
         string memory s = string.concat(messageType, Strings.toHexString(uint160(sender), 20));
         s = string.concat(s, Strings.toString(height));
 
@@ -54,7 +55,7 @@ abstract contract Jackal {
         return s;
     }
 
-    function _remove(uint index) internal {
+    function _remove(uint256 index) internal {
         require(index < messages.length);
         messages[index] = messages[messages.length - 1];
         messages.pop();
@@ -65,18 +66,18 @@ abstract contract Jackal {
     }
 
     function refundFrom(address payable from, string memory id) public hasAllowance(from) {
-        for (uint i = 0; i < messages.length; i ++) {
+        for (uint256 i = 0; i < messages.length; i++) {
             JackalMessage memory m = messages[i];
-            if (Strings.equal(m.id, id)) { // if we found the item we're looking for
-                if (m.height + 60 < block.number) { // if 60 blocks have passed and this message is still here
+            if (Strings.equal(m.id, id)) {
+                // if we found the item we're looking for
+                if (m.height + 60 < block.number) {
+                    // if 60 blocks have passed and this message is still here
                     from.transfer(m.value);
                     _remove(i);
                 }
             }
         }
     }
-
-
 
     function getPrice() public view virtual returns (int256);
 
@@ -135,22 +136,23 @@ abstract contract Jackal {
     }
 
     function postFileFrom(address from, string memory merkle, uint64 filesize, string memory note, uint64 expires)
-    public
-    payable
-    validAddress
-    hasAllowance(from)
+        public
+        payable
+        validAddress
+        hasAllowance(from)
     {
         require(expires >= 30 || expires == 0);
         if (expires != 0) {
             uint256 pE = 0; // getStoragePrice(filesize, 2400); // 12 * 200 months
             require(msg.value >= pE, string.concat("Insufficient payment, need ", Strings.toString(pE), " wei"));
         }
+        newMessage(from, "PostedFile");
         emit PostedFile(from, merkle, filesize, note, expires);
     }
 
     function buyStorage(string memory for_address, uint64 duration_days, uint64 size_bytes, string memory referral)
-    public
-    payable
+        public
+        payable
     {
         buyStorageFrom(msg.sender, for_address, duration_days, size_bytes, referral);
     }
@@ -164,6 +166,7 @@ abstract contract Jackal {
     ) public payable validAddress hasAllowance(from) {
         uint256 pE = 0; // getStoragePrice(size_bytes, duration_days / 30); // months
         require(msg.value >= pE, string.concat("Insufficient payment, need ", Strings.toString(pE), " wei"));
+        newMessage(from, "BoughtStorage");
         emit BoughtStorage(from, for_address, duration_days, size_bytes, referral);
     }
 
@@ -172,6 +175,7 @@ abstract contract Jackal {
     }
 
     function deleteFileFrom(address from, string memory merkle, uint64 start) public validAddress hasAllowance(from) {
+        newMessage(from, "DeletedFile");
         emit DeletedFile(from, merkle, start); // file deletion is free
     }
 
@@ -186,6 +190,7 @@ abstract contract Jackal {
         string memory owner,
         uint64 start
     ) public validAddress hasAllowance(from) {
+        newMessage(from, "RequestedReportForm");
         emit RequestedReportForm(from, prover, merkle, owner, start);
     }
 
@@ -194,6 +199,7 @@ abstract contract Jackal {
     }
 
     function postKeyFrom(address from, string memory key) public validAddress hasAllowance(from) {
+        newMessage(from, "PostedKey");
         emit PostedKey(from, key);
     }
 
@@ -202,10 +208,11 @@ abstract contract Jackal {
     }
 
     function deleteFileTreeFrom(address from, string memory hash_path, string memory account)
-    public
-    validAddress
-    hasAllowance(from)
+        public
+        validAddress
+        hasAllowance(from)
     {
+        newMessage(from, "DeletedFileTree");
         emit DeletedFileTree(from, hash_path, account);
     }
 
@@ -219,6 +226,7 @@ abstract contract Jackal {
         string memory viewers,
         string memory tracking_number
     ) public validAddress hasAllowance(from) {
+        newMessage(from, "ProvisionedFileTree");
         emit ProvisionedFileTree(from, editors, viewers, tracking_number);
     }
 
@@ -244,6 +252,7 @@ abstract contract Jackal {
         string memory editors,
         string memory tracking_number
     ) public validAddress hasAllowance(from) {
+        newMessage(from, "PostedFileTree");
         emit PostedFileTree(from, account, hash_parent, hash_child, contents, viewers, editors, tracking_number);
     }
 
@@ -263,6 +272,7 @@ abstract contract Jackal {
         string memory for_address,
         string memory file_owner
     ) public validAddress hasAllowance(from) {
+        newMessage(from, "AddedViewers");
         emit AddedViewers(from, viewer_ids, viewer_keys, for_address, file_owner);
     }
 
@@ -276,6 +286,7 @@ abstract contract Jackal {
         string memory for_address,
         string memory file_owner
     ) public validAddress hasAllowance(from) {
+        newMessage(from, "RemovedViewers");
         emit RemovedViewers(from, viewer_ids, for_address, file_owner);
     }
 
@@ -284,10 +295,11 @@ abstract contract Jackal {
     }
 
     function resetViewersFrom(address from, string memory for_address, string memory file_owner)
-    public
-    validAddress
-    hasAllowance(from)
+        public
+        validAddress
+        hasAllowance(from)
     {
+        newMessage(from, "ResetViewers");
         emit ResetViewers(from, for_address, file_owner);
     }
 
@@ -296,10 +308,11 @@ abstract contract Jackal {
     }
 
     function changeOwnerFrom(address from, string memory for_address, string memory file_owner, string memory new_owner)
-    public
-    validAddress
-    hasAllowance(from)
+        public
+        validAddress
+        hasAllowance(from)
     {
+        newMessage(from, "ChangedOwner");
         emit ChangedOwner(from, for_address, file_owner, new_owner);
     }
 
@@ -319,6 +332,7 @@ abstract contract Jackal {
         string memory for_address,
         string memory file_owner
     ) public validAddress hasAllowance(from) {
+        newMessage(from, "AddedEditors");
         emit AddedEditors(from, editor_ids, editor_keys, for_address, file_owner);
     }
 
@@ -332,6 +346,7 @@ abstract contract Jackal {
         string memory for_address,
         string memory file_owner
     ) public validAddress hasAllowance(from) {
+        newMessage(from, "RemovedEditors");
         emit RemovedEditors(from, editor_ids, for_address, file_owner);
     }
 
@@ -340,10 +355,11 @@ abstract contract Jackal {
     }
 
     function resetEditorsFrom(address from, string memory for_address, string memory file_owner)
-    public
-    validAddress
-    hasAllowance(from)
+        public
+        validAddress
+        hasAllowance(from)
     {
+        newMessage(from, "ResetEditors");
         emit ResetEditors(from, for_address, file_owner);
     }
 
@@ -357,6 +373,7 @@ abstract contract Jackal {
         string memory contents,
         string memory private_contents
     ) public validAddress hasAllowance(from) {
+        newMessage(from, "CreatedNotification");
         emit CreatedNotification(from, to, contents, private_contents);
     }
 
@@ -369,6 +386,7 @@ abstract contract Jackal {
         validAddress
         hasAllowance(from)
     {
+        newMessage(from, "DeletedNotification");
         emit DeletedNotification(from, notification_from, time);
     }
 
@@ -377,6 +395,7 @@ abstract contract Jackal {
     }
 
     function blockSendersFrom(address from, string[] memory to_block) public validAddress hasAllowance(from) {
+        newMessage(from, "BlockedSenders");
         emit BlockedSenders(from, to_block);
     }
 }

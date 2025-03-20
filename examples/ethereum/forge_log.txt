@@ -1,14 +1,14 @@
 You have just generated a new seed phrase for this relay at /root/.mulberry/seed.json
-Mulberry EVM address: 0x754057b801993C59Ed741A4405Df791466732C2A
-Wallet Address: jkl1muscmp3t2e755cxjtrafk0wdc3p6ufevmch9su
-Mulberry EVM address: 0x754057b801993C59Ed741A4405Df791466732C2A
-2025/03/20 15:44:27 Starting relay...
-3:44PM DBG ../app/jackal/uploader/queue.go:128 > updating gecko...
-3:44PM DBG ../app/relay/eth.go:22 > Connecting to Ethereum Sepolia network="Ethereum Sepolia"
-3:44PM DBG ../app/relay/eth.go:71 > Ready to listen on Ethereum Sepolia network="Ethereum Sepolia"
-3:44PM DBG ../app/jackal/uploader/queue.go:142 > updated gecko with 0.115066
-3:44PM DBG ../app/relay/eth.go:93 > Log received: 0x5FbDB2315678afecb367f032d93F642f64180aa3 network="Ethereum Sepolia"
-3:44PM DBG ../app/relay/eth.go:93 > Log received: 0x5FbDB2315678afecb367f032d93F642f64180aa3 network="Ethereum Sepolia"
-2025/03/20 15:44:31 Event details: {From:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 Merkle:placeholder-merkle-root Size:1048576 Note: Expires:30}
-2025/03/20 15:44:31 Failed to decode merkle: encoding/hex: invalid byte: U+0070 'p'
-2025/03/20 15:44:31 Failed to unpack event 0xb69a3158e99a25f2374c54d049cb4061b88a17de1583f916a96053268217a346: <nil> encoding/hex: invalid byte: U+0070 'p'
+Mulberry EVM address: 0x968d639628Da77A74CDb0DEabE8d8284394A4547
+Wallet Address: jkl1cd3h8eh5ryj9ca57ckqv5najs9k4vkze7yzju4
+2025/03/20 20:43:21 Starting relay...
+Mulberry EVM address: 0x968d639628Da77A74CDb0DEabE8d8284394A4547
+8:43PM DBG ../app/jackal/uploader/queue.go:128 > updating gecko...
+8:43PM DBG ../app/relay/eth.go:22 > Connecting to Ethereum Sepolia network="Ethereum Sepolia"
+8:43PM DBG ../app/relay/eth.go:71 > Ready to listen on Ethereum Sepolia network="Ethereum Sepolia"
+8:43PM DBG ../app/relay/eth.go:93 > Log received: 0x5FbDB2315678afecb367f032d93F642f64180aa3 network="Ethereum Sepolia"
+8:43PM DBG ../app/jackal/uploader/queue.go:142 > updated gecko with 0.113673
+8:43PM DBG ../app/relay/eth.go:93 > Log received: 0x5FbDB2315678afecb367f032d93F642f64180aa3 network="Ethereum Sepolia"
+2025/03/20 20:43:25 Event details: {From:0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 Merkle:placeholder-merkle-root Size:1048576 Note: Expires:30}
+2025/03/20 20:43:25 Failed to decode merkle: encoding/hex: invalid byte: U+0070 'p'
+2025/03/20 20:43:25 Failed to unpack event 0xb69a3158e99a25f2374c54d049cb4061b88a17de1583f916a96053268217a346: <nil> encoding/hex: invalid byte: U+0070 'p'

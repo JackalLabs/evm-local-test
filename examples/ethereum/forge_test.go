@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/big"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -113,14 +112,6 @@ func (s *OutpostTestSuite) SetupForgeSuite(ctx context.Context) {
 }
 
 func (s *OutpostTestSuite) TestForge() {
-	// intercept SIGTERM (Ctrl + C)
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		<-c
-		cleanForgeSuite()
-	}()
-
 	ctx := context.Background()
 	s.SetupForgeSuite(ctx)
 
@@ -266,11 +257,6 @@ func (s *OutpostTestSuite) TestForge() {
 		fmt.Println("made it to the end")
 	}))
 	time.Sleep(10 * time.Second)
-}
-
-func cleanForgeSuite() {
 	eth.ExecuteCommand("killall", []string{"anvil"})
 	e2esuite.StopContainer(containerID)
-	time.Sleep(10 * time.Second)
-	os.Exit(1)
 }

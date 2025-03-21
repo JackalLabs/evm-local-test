@@ -3,6 +3,7 @@ package chainconfig
 import (
 	"encoding/json"
 	"fmt"
+	"runtime"
 
 	interchaintest "github.com/strangelove-ventures/interchaintest/v7"
 	testtypes "github.com/strangelove-ventures/interchaintest/v7/examples/ethereum/types"
@@ -58,6 +59,14 @@ var genesisAllowICH = map[string]interface{}{
 	},
 }
 
+// golang doesn't have ternary operators
+var repo = func() string {
+	if runtime.GOARCH == "arm64" {
+		return "biphan4/canine-evm"
+	}
+	return "anthonyjackallabs/canined"
+}()
+
 var ChainSpecs = []*interchaintest.ChainSpec{
 	// Ethereum
 	// {
@@ -92,8 +101,8 @@ var ChainSpecs = []*interchaintest.ChainSpec{
 			Images: []ibc.DockerImage{
 				{
 					// below is arm, x86 can use anthonyjackallabs/canined
-					Repository: "biphan4/canine-evm", // FOR LOCAL IMAGE USE: Docker Image Name
-					Version:    "0.0.1",              // FOR LOCAL IMAGE USE: Docker Image Tag
+					Repository: repo,    // FOR LOCAL IMAGE USE: Docker Image Name
+					Version:    "0.0.1", // FOR LOCAL IMAGE USE: Docker Image Tag
 				}, // NOTE: Jackal Labs canary version atleast returns an error,
 				// Every other version just stalls out
 			},

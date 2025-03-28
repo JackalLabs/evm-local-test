@@ -1,6 +1,9 @@
 package e2esuite
 
 type MulberryConfig struct {
+	MulberrySettings struct {
+		CastPath string `yaml:"cast_path"`
+	} `yaml:"mulberry_settings"`
 	JackalConfig struct {
 		RPC      string `yaml:"rpc"`
 		GRPC     string `yaml:"grpc"`

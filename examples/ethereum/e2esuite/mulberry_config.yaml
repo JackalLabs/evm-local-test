@@ -1,6 +1,8 @@
+mulberry_settings:
+  cast_path: /bin/false
 jackal_config:
-  rpc: http://127.0.0.1:53532
-  grpc: 127.0.0.1:53533
+  rpc: http://127.0.0.1:39171
+  grpc: 127.0.0.1:36653
   seed_file: seed.json
   contract: jkl14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9scsc9nr
 networks_config:
